@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "frc"
+version = "0.1.0"
+description = "Library for computing Fourier Ring Correlation (FRC) curves and using them to determine image resolution."
+authors = ["Tip ten Brink <T.M.tenBrink@student.tudelft.nl>"]
+readme = "README.md"
+
+[tool.poetry.urls]
+"Source Code" = "https://github.com/tmtenbrink/frc"
+
+
+[tool.poetry.dependencies]
+python = ">=3.7, <3.11"
+numpy = "^1.18"
+diplib = "^3.1.0"
+scipy = "^1.7.1"
+rustfrc = "^1.1.1"
+
+[tool.poetry.dev-dependencies]
+pytest = "^6.2"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
