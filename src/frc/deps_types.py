@@ -20,6 +20,8 @@ np = numpy
 Callable = typing.Callable
 Union = typing.Union
 Optional = typing.Optional
+List = typing.List
+Tuple = typing.Tuple
 
 # Img type that allows interchangeable use of diplib Image and numpy array
 Img = typing.TypeVar('Img', dip.Image, np.ndarray)

@@ -7,7 +7,7 @@
 # Tip ten Brink
 
 import rustfrc as r_frc
-from frc.deps_types import Img, np, dip, Callable, Optional, Func1D, Union
+from frc.deps_types import Img, np, dip, Callable, Optional, Func1D, Union, Tuple
 import frc._internal_utility as _util
 import frc.utility as frc_util
 
@@ -61,7 +61,8 @@ def two_frc(img1: Img, img2: Img) -> np.ndarray:
 
     :param img1: Img representing the first image (half data set)
     :param img2: Img representing the second image (half data set)
-    :return: A 1D array with the FRC value for Fourier ring, with the index representing the pixel distance from the origin.
+    :return: A 1D array with the FRC value for Fourier ring, with the index
+    representing the pixel distance from the origin.
     """
     # Check if array to test if images must be converted
     is_arr = isinstance(img1, np.ndarray)
@@ -113,7 +114,7 @@ def one_frc(img: Img, method: int = 1) -> np.ndarray:
     if not _util.are_axes_equal(img):
         raise ValueError("Image does not have equal axes! Trim or pad it first.")
 
-    split_method: Callable[[np.ndarray], tuple[np.ndarray, np.ndarray]]
+    split_method: Callable[[np.ndarray], Tuple[np.ndarray, np.ndarray]]
     if method == 1:
         split_method = _one_frc1
     elif method == 2:
@@ -131,12 +132,12 @@ def one_frc(img: Img, method: int = 1) -> np.ndarray:
     return _frc(dip1, dip2)
 
 
-def _one_frc2(img: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+def _one_frc2(img: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
     """ Performs two independent binomial splits. """
     return r_frc.binom_split(img), r_frc.binom_split(img)
 
 
-def _one_frc1(img: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+def _one_frc1(img: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
     """ Performs a single binomial split, with the second image equal to the
     difference of the sampled image and the input image. """
     img_half1 = r_frc.binom_split(img)
@@ -178,7 +179,7 @@ def half_bit_threshold(img_size: int) -> Func1D:
 
 
 def frc_res(xs: np.ndarray, frc_curve: np.ndarray, img_size: int,
-            threshold: Optional[Union[str, Func1D]] = None) -> tuple[float, float, Func1D]:
+            threshold: Optional[Union[str, Func1D]] = None) -> Tuple[float, float, Func1D]:
     """
     Calculate the resolution from a FRC curve.
 

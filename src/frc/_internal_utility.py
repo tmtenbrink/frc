@@ -5,7 +5,7 @@
 #                                   TU Delft
 # Tip ten Brink
 
-from frc.deps_types import Img, np, dip
+from frc.deps_types import Img, np, dip, List
 
 
 def dipornp(img: Img, was_arr: bool, is_arr: bool) -> Img:
@@ -29,7 +29,7 @@ def are_axes_equal(a: np.ndarray) -> bool:
     return axes_equal
 
 
-def are_sizes_equal(arrs: list[np.ndarray], check_equal_axes=True) -> bool:
+def are_sizes_equal(arrs: List[np.ndarray], check_equal_axes=True) -> bool:
     sizes = np.empty((len(arrs)), dtype=tuple)
     first_value = sizes.copy()
     for i, a in enumerate(arrs):
@@ -42,11 +42,9 @@ def are_sizes_equal(arrs: list[np.ndarray], check_equal_axes=True) -> bool:
     return equal_sizes and (not check_equal_axes or are_axes_equal(arrs[0]))
 
 
-def separate_noncontiguous(a: np.ndarray) -> list[np.ndarray]:
+def separate_noncontiguous(a: np.ndarray) -> List[np.ndarray]:
     diff = np.diff(a)
     # Indices of a that start a new noncontiguous group
     diff_i_gt1 = np.asarray(diff > 1).nonzero()[0] + 1
 
     return np.split(a, diff_i_gt1)
-
-
