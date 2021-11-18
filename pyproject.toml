@@ -8,13 +8,12 @@ readme = "README.md"
 [tool.poetry.urls]
 "Source Code" = "https://github.com/tmtenbrink/frc"
 
-
 [tool.poetry.dependencies]
-python = ">=3.7, <3.11"
+python = ">=3.7, <3.10"
 numpy = "^1.18"
 diplib = "^3.1.0"
-scipy = "^1.7.1"
-rustfrc = "^1.1.1"
+scipy = "^1.3"
+rustfrc = "^1.1.2"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2"
