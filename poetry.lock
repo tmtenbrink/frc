@@ -71,14 +71,14 @@ python-versions = ">=3.7,<3.11"
 
 [[package]]
 name = "packaging"
-version = "21.2"
+version = "21.3"
 description = "Core utilities for Python packages"
 category = "dev"
 optional = false
 python-versions = ">=3.6"
 
 [package.dependencies]
-pyparsing = ">=2.0.2,<3"
+pyparsing = ">=2.0.2,<3.0.5 || >3.0.5"
 
 [[package]]
 name = "pluggy"
@@ -105,11 +105,14 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
 
 [[package]]
 name = "pyparsing"
-version = "2.4.7"
+version = "3.0.6"
 description = "Python parsing module"
 category = "dev"
 optional = false
-python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*"
+python-versions = ">=3.6"
+
+[package.extras]
+diagrams = ["jinja2", "railroad-diagrams"]
 
 [[package]]
 name = "pytest"
@@ -135,7 +138,7 @@ testing = ["argcomplete", "hypothesis (>=3.56)", "mock", "nose", "requests", "xm
 
 [[package]]
 name = "rustfrc"
-version = "1.1.1"
+version = "1.1.2"
 description = "Fast utility functions useful for Fourier Ring/Shell Correlation: binom_split, pois_gen, square_abs."
 category = "main"
 optional = false
@@ -254,8 +257,8 @@ numpy = [
     {file = "numpy-1.21.4.zip", hash = "sha256:e6c76a87633aa3fa16614b61ccedfae45b91df2767cf097aa9c933932a7ed1e0"},
 ]
 packaging = [
-    {file = "packaging-21.2-py3-none-any.whl", hash = "sha256:14317396d1e8cdb122989b916fa2c7e9ca8e2be9e8060a6eff75b6b7b4d8a7e0"},
-    {file = "packaging-21.2.tar.gz", hash = "sha256:096d689d78ca690e4cd8a89568ba06d07ca097e3306a4381635073ca91479966"},
+    {file = "packaging-21.3-py3-none-any.whl", hash = "sha256:ef103e05f519cdc783ae24ea4e2e0f508a9c99b2d4969652eed6a2e1ea5bd522"},
+    {file = "packaging-21.3.tar.gz", hash = "sha256:dd47c42927d89ab911e606518907cc2d3a1f38bbd026385970643f9c5b8ecfeb"},
 ]
 pluggy = [
     {file = "pluggy-1.0.0-py2.py3-none-any.whl", hash = "sha256:74134bbf457f031a36d68416e1509f34bd5ccc019f0bcc952c7b909d06b37bd3"},
@@ -266,31 +269,31 @@ py = [
     {file = "py-1.11.0.tar.gz", hash = "sha256:51c75c4126074b472f746a24399ad32f6053d1b34b68d2fa41e558e6f4a98719"},
 ]
 pyparsing = [
-    {file = "pyparsing-2.4.7-py2.py3-none-any.whl", hash = "sha256:ef9d7589ef3c200abe66653d3f1ab1033c3c419ae9b9bdb1240a85b024efc88b"},
-    {file = "pyparsing-2.4.7.tar.gz", hash = "sha256:c203ec8783bf771a155b207279b9bccb8dea02d8f0c9e5f8ead507bc3246ecc1"},
+    {file = "pyparsing-3.0.6-py3-none-any.whl", hash = "sha256:04ff808a5b90911829c55c4e26f75fa5ca8a2f5f36aa3a51f68e27033341d3e4"},
+    {file = "pyparsing-3.0.6.tar.gz", hash = "sha256:d9bdec0013ef1eb5a84ab39a3b3868911598afa494f5faa038647101504e2b81"},
 ]
 pytest = [
     {file = "pytest-6.2.5-py3-none-any.whl", hash = "sha256:7310f8d27bc79ced999e760ca304d69f6ba6c6649c0b60fb0e04a4a77cacc134"},
     {file = "pytest-6.2.5.tar.gz", hash = "sha256:131b36680866a76e6781d13f101efb86cf674ebb9762eb70d3082b6f29889e89"},
 ]
 rustfrc = [
-    {file = "rustfrc-1.1.1-cp310-cp310-macosx_10_7_x86_64.whl", hash = "sha256:8cabee681084553b5390393dd6cc5289f007e082b58379bc05202717f8d295ae"},
-    {file = "rustfrc-1.1.1-cp310-cp310-macosx_10_9_x86_64.macosx_11_0_arm64.macosx_10_9_universal2.whl", hash = "sha256:8dbd254a2ffe2a3d3a20bfd26190df31dc826e63956df3af7f842d9de58d6be1"},
-    {file = "rustfrc-1.1.1-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:a565e04f3c1324d3c4462fc5d38a011f90f469941d33a1c782eb25e70ea4f2f9"},
-    {file = "rustfrc-1.1.1-cp310-none-win_amd64.whl", hash = "sha256:d2489ae3ed9862efb9229b9cbb1a290d2b4b0b4d1c2fa919b50bb1d69a9be22f"},
-    {file = "rustfrc-1.1.1-cp37-cp37m-macosx_10_7_x86_64.whl", hash = "sha256:0e6091ebb725f6e43f16cd879522984302fb4d08250525e0968180afdaa33a85"},
-    {file = "rustfrc-1.1.1-cp37-cp37m-macosx_10_9_x86_64.macosx_11_0_arm64.macosx_10_9_universal2.whl", hash = "sha256:5136be5f8c3ecaea9416ba6ae737e23552d25c080139bb5bedcd8390758b7a0d"},
-    {file = "rustfrc-1.1.1-cp37-cp37m-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:e14b8d562ef339df8a3358af2cf9f2d11580799fb7e71c86d9fbe1fdd2a860ca"},
-    {file = "rustfrc-1.1.1-cp37-none-win_amd64.whl", hash = "sha256:45361d1fbe1d8fff32f79416dd91c719375521ddb4a1dcb452cbb6f2ae450012"},
-    {file = "rustfrc-1.1.1-cp38-cp38-macosx_10_7_x86_64.whl", hash = "sha256:b46d6e883c5db191dfe068531bfd473a07751e9d046f55bf95ea888f493baac5"},
-    {file = "rustfrc-1.1.1-cp38-cp38-macosx_10_9_x86_64.macosx_11_0_arm64.macosx_10_9_universal2.whl", hash = "sha256:2fb7f1b05f855a1c3970f746d8b04f9790733423563597721c5fd644eddfc179"},
-    {file = "rustfrc-1.1.1-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:93a46742f9d203c6c7efb54ce8f91ab3df4c631ccb566196518b9a540c9e9045"},
-    {file = "rustfrc-1.1.1-cp38-none-win_amd64.whl", hash = "sha256:fa7b4ff4fd93361dd5edc1648e4e4f42ccd1caa29319962ae2a51194a77feb5b"},
-    {file = "rustfrc-1.1.1-cp39-cp39-macosx_10_7_x86_64.whl", hash = "sha256:8384aed40bc7cdddb09af0ff05ea424c8061818d60a0e660516011928e6f92a6"},
-    {file = "rustfrc-1.1.1-cp39-cp39-macosx_10_9_x86_64.macosx_11_0_arm64.macosx_10_9_universal2.whl", hash = "sha256:a2f7541f3594b7b47eb6d5d4c1cb8aedf73f6847c407a04fece8c917f5bac663"},
-    {file = "rustfrc-1.1.1-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:857437ba1c4c6699c1167bcb313271455f5c9b52bb52d4ac363c3756a5a3a1af"},
-    {file = "rustfrc-1.1.1-cp39-none-win_amd64.whl", hash = "sha256:f3c8510cebfcee5098e5a4c008172c37246023aa35277c44d6f88669bfa15453"},
-    {file = "rustfrc-1.1.1.tar.gz", hash = "sha256:43686f159b5032d282504371c23dc7aead72160bc4cbcd9957bffa99d1e65fc9"},
+    {file = "rustfrc-1.1.2-cp310-cp310-macosx_10_7_x86_64.whl", hash = "sha256:04fc152b32d337e89d228067feb82d56690b7effd728881c299725e581ca2787"},
+    {file = "rustfrc-1.1.2-cp310-cp310-macosx_10_9_x86_64.macosx_11_0_arm64.macosx_10_9_universal2.whl", hash = "sha256:aff02975f8c7d13f663183f6b06bce533c89f3c5f77506adef7819df3fa8993e"},
+    {file = "rustfrc-1.1.2-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:e0189b8b57f6067bc78b9647a325bec537029ca8f31fd441eff3c77dd4790a47"},
+    {file = "rustfrc-1.1.2-cp310-none-win_amd64.whl", hash = "sha256:04c5450af5c938a07cbc2950b6fbfc4be18fbdb0887a411d5c5a4f5356169aca"},
+    {file = "rustfrc-1.1.2-cp37-cp37m-macosx_10_7_x86_64.whl", hash = "sha256:79ac2d42bd668a2337c208e82f6ae896b1a507075648d0066b1526585026eb8e"},
+    {file = "rustfrc-1.1.2-cp37-cp37m-macosx_10_9_x86_64.macosx_11_0_arm64.macosx_10_9_universal2.whl", hash = "sha256:10a615b97e5a6193fe16ba4e79ed948b972a097247d922e6b03ae792ed423306"},
+    {file = "rustfrc-1.1.2-cp37-cp37m-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:8afe8156a2cc2a8174da553adf22e625c61662d77bafd92632e78d71e482346c"},
+    {file = "rustfrc-1.1.2-cp37-none-win_amd64.whl", hash = "sha256:facab9eac7bc45d139d7182a50482bdf9d5010e4f5af314f723fef21223ebfe4"},
+    {file = "rustfrc-1.1.2-cp38-cp38-macosx_10_7_x86_64.whl", hash = "sha256:003ef3bafc4c963f02e1a23e91a8bff21141547c2148f03317b942ebf28d7507"},
+    {file = "rustfrc-1.1.2-cp38-cp38-macosx_10_9_x86_64.macosx_11_0_arm64.macosx_10_9_universal2.whl", hash = "sha256:64647115953a0f79cfa6e3dd408986b8d4518aba623cf51cba926b5a1ebab71f"},
+    {file = "rustfrc-1.1.2-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:c3cb286659d1a5922d754fc75864bbdc81037e919a70451fe569568c84d7be56"},
+    {file = "rustfrc-1.1.2-cp38-none-win_amd64.whl", hash = "sha256:c694832bb267e70515141c73dc5a7a15eeb91b6529c13e833c1c714604a9e87c"},
+    {file = "rustfrc-1.1.2-cp39-cp39-macosx_10_7_x86_64.whl", hash = "sha256:f1232fe9b0739cd096d554eb006435953b57e98c3ef1e96609e08efabfe605a7"},
+    {file = "rustfrc-1.1.2-cp39-cp39-macosx_10_9_x86_64.macosx_11_0_arm64.macosx_10_9_universal2.whl", hash = "sha256:7f15ed04efc43e3c3f86a938dc3e3ae554e22a0adde73ffaeeb2049091b8af9b"},
+    {file = "rustfrc-1.1.2-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:75597e8b14386ba1960960f76b03f9f053dcafc159f0d8eb4bea0c3aed9ecb73"},
+    {file = "rustfrc-1.1.2-cp39-none-win_amd64.whl", hash = "sha256:82b872e62900fe49043d0eccd6268fa805ef562043a081c4446d842ea6eac85f"},
+    {file = "rustfrc-1.1.2.tar.gz", hash = "sha256:db2a48c13eb81371cfa055ae7ff0c16dc500ffebbf10d9e160132398c9095916"},
 ]
 scipy = [
     {file = "scipy-1.7.2-1-cp310-cp310-win_amd64.whl", hash = "sha256:dc2d1bf41294e63c7302bf499973ac0c7f73c93c01763db43055f6525234bf11"},
