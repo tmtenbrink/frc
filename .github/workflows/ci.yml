@@ -33,6 +33,8 @@ jobs:
           pip install numpy==1.18.0 --only-binary :all:
           pip install scipy==1.3.2 --only-binary :all:
           pip install diplib=3.1.0 --only-binary :all:
+      - name: Install project
+        run: poetry install --only-root
       - name: Pytest
         run: poetry run pytest
       - name: Build

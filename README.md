@@ -4,21 +4,23 @@
 
 This is particularly useful for determining the resolution of images taken with super-resolution microscopy techniques.
 
-Its most computationally intensive functions are all implemented either in NumPy or Rust, making this library very fast.
+Its most computationally intensive functions are all implemented either in NumPy or Rust, making this library quite performant.
 
 ### Fourier Ring Correlation
 
 Introduced in 1982, Fourier Ring Correlation compares two 2D images, which are assumed to be noise-independent. In Fourier space, mage structure dominates the lower spatial frequencies (in the Fourier domain), while noise dominates at the higher frequencies.
 
-In Fourier space, there are rings of constant spatial frequency around the origin. By calculating the correlation between the rings in the two images, you get the FRC curve:
-
-![formula](https://render.githubusercontent.com/render/math?math=%5Ccolor%7Bgray%7D%5Ctext%7BFRC%7D%28q%29%20%3D%20%5Cfrac%7B%5Csum_%7B%5Cvec%7Bq%7D%20%5Cin%20%5Ctext%7Bcircle%7D%7D%20%5Cwidehat%7Bf_1%7D%28%5Cvec%7Bq%7D%29%20%5Cwidehat%7Bf_2%7D%28%5Cvec%7Bq%7D%29%5E%7B%5Ctextbf%7B%2A%7D%7D%7D%7B%5Csqrt%7B%5Csum_%7B%5Cvec%7Bq%7D%20%5Cin%20%5Ctext%7Bcircle%7D%7D%20%5Clvert%5Cwidehat%7Bf_1%7D%28%5Cvec%7Bq%7D%29%5Crvert%5E2%7D%20%5Csqrt%7B%5Csum_%7B%5Cvec%7Bq%7D%20%5Cin%20%5Ctext%7Bcircle%7D%7D%20%5Clvert%5Cwidehat%7Bf_2%7D%28%5Cvec%7Bq%7D%29%5Crvert%5E2%7D%7D%0A)
-
-See the accompanying `FRC.pdf` for additional details.
+In Fourier space, there are rings of constant spatial frequency around the origin. By calculating the correlation between the rings in the two images (varying the spatial frequency), you can compute an FRC curve (y-axis: correlation, x-axis: spatial frequency).
 
 At some spatial frequency, the signal cannot be separated from the noise. What spatial frequency exactly depends on what threshold function is used. The standard 0.143 and 1/2-bit thresholds are both available, as well as an algorithm to compute the intersection and resulting resolution.
 
+For additional information about Fourier Ring Correlation, see [R.P.J. Nieuwenhuizen et al. (2013)](https://doi.org/10.1038/nmeth.2448).
 
+#### 1FRC
+
+FRC requires two noise-independent images to work. However, modern cameras are often shot noise-limited (Poisson noise). This library includes a new method due to Bernd Rieger and Sjoerd Stallinga (Department of Imaging Physics, TU Delft), called 1FRC, which uses a technique called binomial splitting to derive two images from a single one, where the pixel counts of the derived images are independently Poisson noise distributed.
+
+They have an upcoming paper detailing the method and providing. This library was produced for my bachelor thesis, which focused on 1FRC and can be found [here](http://resolver.tudelft.nl/uuid:abdc31f6-6ecd-4c1b-a0c4-53711829467a).
 
 ### Installation
 
