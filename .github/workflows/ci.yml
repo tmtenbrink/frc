@@ -32,7 +32,7 @@ jobs:
           . $(poetry env info --path)/bin/activate
           pip install numpy==1.18.0 --only-binary :all:
           pip install scipy==1.3.2 --only-binary :all:
-          pip install diplib=3.1.0 --only-binary :all:
+          pip install diplib==3.1.0 --only-binary :all:
       - name: Install project
         run: poetry install --only-root
       - name: Pytest
@@ -59,7 +59,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: 3.10
+        python-version: '3.10'
     - name: Install wheel test
       run: |
         pip install ${{ github.workspace }}/dist/*.whl

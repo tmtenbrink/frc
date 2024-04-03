@@ -20,7 +20,7 @@ For additional information about Fourier Ring Correlation, see [R.P.J. Nieuwenhu
 
 FRC requires two noise-independent images to work. However, modern cameras are often shot noise-limited (Poisson noise). This library includes a new method due to Bernd Rieger and Sjoerd Stallinga (Department of Imaging Physics, TU Delft), called 1FRC, which uses a technique called binomial splitting to derive two images from a single one, where the pixel counts of the derived images are independently Poisson noise distributed.
 
-They have an upcoming paper detailing the method and providing. This library was produced for my bachelor thesis, which focused on 1FRC and can be found [here](http://resolver.tudelft.nl/uuid:abdc31f6-6ecd-4c1b-a0c4-53711829467a).
+They have an upcoming paper detailing the method and providing additional theoretical and experimental justification. This library was produced for my bachelor thesis (which focused on 1FRC) and was supervised by Bernd Rieger. [The bachelor thesis can be found here.](http://resolver.tudelft.nl/uuid:abdc31f6-6ecd-4c1b-a0c4-53711829467a).
 
 ### Installation
 
@@ -59,3 +59,26 @@ plt.plot(xs_nm_freq, thres(xs_nm_freq))
 plt.plot(xs_nm_freq, frc_curve)
 plt.show()
 ```
+
+#### Troubleshooting
+
+If you cannot find an intersection (`NoIntersectionException`), be sure to plot the curve without using the `frc_res` method and see if there even is an intersection. For example:
+
+```python
+import frc
+import numpy as np
+import matplotlib.pyplot as plt
+
+img = ... # get an image and scale
+
+# Apply 1FRC technique
+frc_curve = frc.one_frc(img)
+img_size = img.shape[0]
+xs_pix = np.arange(len(frc_curve)) / img_size
+# scale has units [pixels <length unit>^-1] corresponding to original image
+xs_nm_freq = xs_pix * scale
+plt.plot(xs_nm_freq, frc_curve)
+plt.show()
+```
+
+For images with a significant amount of non-Poisson noise, the 1FRC method has been shown to fail (adjustments are possible).
