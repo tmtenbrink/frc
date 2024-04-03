@@ -12,42 +12,34 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-          py-version: ['3.7', '3.8', '3.9']
+          py-version: ['3.8', '3.9', '3.10', '3.11', '3.12']
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Set up Python
-        uses: actions/setup-python@v2
+        id: setup-py
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.py-version }}
-      - name: Load cached Poetry installation
-        uses: actions/cache@v2
-        with:
-          path: ~/.local 
-          key: poetry-0 
-      - name: Install Poetry
-        uses: snok/install-poetry@v1
-        with:
-          virtualenvs-create: true
-          virtualenvs-in-project: true
-      - name: Load cached venv
-        id: cached-pip-wheels
-        uses: actions/cache@v2
-        with:
-          path: ~/.cache
-          key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
-      - name: Install dependencies
-        run: poetry install --no-interaction --no-root
-      - name: Install library
-        run: poetry install --no-interaction
-      - name: Pytest
+      - name: Poetry
+        run: pipx install poetry==1.8.2
+      - name: Poetry install
         run: |
-          source $VENV
-          pytest
+          poetry env use '${{ steps.setup-py.outputs.python-path }}'
+          poetry install --sync --no-root
+      - name: Test lower version
+        if: ${{ matrix.py-version == '3.8' }}
+        run: |
+          . $(poetry env info --path)/bin/activate
+          pip install numpy==1.18.0 --only-binary :all:
+          pip install scipy==1.3.2 --only-binary :all:
+          pip install diplib=3.1.0 --only-binary :all:
+      - name: Pytest
+        run: poetry run pytest
       - name: Build
         run: poetry build
       - name: Upload artifact
-        if: ${{ matrix.py-version == '3.9' }}
-        uses: actions/upload-artifact@v2
+        if: ${{ matrix.py-version == '3.10' }}
+        uses: actions/upload-artifact@v4
         with:
           name: dist
           path: ${{ github.workspace }}/dist/
@@ -58,14 +50,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Download artifact
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v4
       with:
         name: dist
         path: ${{ github.workspace }}/dist/
     - name: Set up Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v5
       with:
-        python-version: 3.9
+        python-version: 3.10
     - name: Install wheel test
       run: |
         pip install ${{ github.workspace }}/dist/*.whl
