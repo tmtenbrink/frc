@@ -49,6 +49,8 @@ jobs:
   publish:
     needs: [buildtest]
     name: Wheel-Publish
+    permissions:
+      id-token: write
     runs-on: ubuntu-latest
     steps:
     - name: Download artifact
