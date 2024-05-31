@@ -20,7 +20,9 @@ For additional information about Fourier Ring Correlation, see [R.P.J. Nieuwenhu
 
 FRC requires two noise-independent images to work. However, modern cameras are often shot noise-limited (Poisson noise). This library includes a new method due to Bernd Rieger and Sjoerd Stallinga (Department of Imaging Physics, TU Delft), called 1FRC, which uses a technique called binomial splitting to derive two images from a single one, where the pixel counts of the derived images are independently Poisson noise distributed.
 
-They have an upcoming paper detailing the method and providing additional theoretical and experimental justification. This library was produced for my bachelor thesis (which focused on 1FRC) and was supervised by Bernd Rieger. [The bachelor thesis can be found here.](http://resolver.tudelft.nl/uuid:abdc31f6-6ecd-4c1b-a0c4-53711829467a).
+This library was produced for my bachelor thesis in 2022 (which focused on 1FRC) and was supervised by Bernd Rieger. [The bachelor thesis can be found here](http://resolver.tudelft.nl/uuid:abdc31f6-6ecd-4c1b-a0c4-53711829467a). Bernd Rieger and Sjoerd Stallinga continued research, leading to a peer reviewed paper published in 2024 in Optics Express, [which can be found here](https://doi.org/10.1364/OE.524683). Their paper includes many details on the limitations of 1FRC and when exactly it is appropriate. I repeat the abstract below:
+
+> We address resolution assessment for (light super-resolution) microscopy imaging. In modalities where imaging is not diffraction limited, correlation between two noise independent images is the standard way to infer the resolution. Here we take away the need for two noise independent images by computationally splitting one image acquisition into two noise independent realizations. This procedure generates two Poisson noise distributed images if the input is Poissonian distributed. As most modern cameras are shot-noise limited this procedure is directly applicable. However, also in the presence of readout noise we can compute the resolution faithfully via a correction factor. We evaluate our method on simulations and experimental data of widefield microscopy, STED microscopy, rescan confocal microscopy, image scanning microscopy, conventional confocal microscopy, and transmission electron microscopy. In all situations we find that using one image instead of two results in the same computed image resolution.
 
 ### Installation
 
@@ -30,7 +32,7 @@ You can download this library from PyPI:
 pip install frc
 ```
 
-This library depends on [tmtenbrink/rustfrc](https://www.github.com/tmtenbrink/rustfrc), [DIPlib](https://github.com/DIPlib/diplib), [scipy](https://scipy.org/) and of course, [numpy](https://numpy.org/).
+This library depends on [tmtenbrink/rustfrc](https://www.github.com/tmtenbrink/rustfrc) (a Rust extension developed specifically for this library), [DIPlib](https://github.com/DIPlib/diplib), [scipy](https://scipy.org/) and of course, [numpy](https://numpy.org/).
 
 ### Usage
 
