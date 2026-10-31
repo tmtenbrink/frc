@@ -84,3 +84,7 @@ plt.show()
 ```
 
 For images with a significant amount of non-Poisson noise, the 1FRC method has been shown to fail (adjustments are possible).
+
+### Development
+
+frc uses [uv](https://github.com/astral-sh/uv). Run `uv sync` to create a virtual environment with the (development) dependencies, `uv run pytest` to run the tests and `uv build` to build the package.
