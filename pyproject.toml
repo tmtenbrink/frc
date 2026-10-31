@@ -1,35 +1,43 @@
-[tool.poetry]
+[project]
 name = "frc"
-version = "0.1.1"
+version = "0.1.2"
 description = "Library for computing Fourier Ring Correlation (FRC) curves and using them to determine image resolution."
-authors = ["Tip ten Brink <T.M.tenBrink@student.tudelft.nl>"]
+authors = [
+    {name = "Tip ten Brink", email = "tip@tenbrinkmeijs.com"},
+]
 readme = "README.md"
-packages = [
-    { include = "frc", from = "src" },
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.8, <3.13"
+dependencies = [
+    "diplib >= 3.1.0",
+    "scipy >= 1.3.2; python_version < '3.12'",
+    "scipy >= 1.11.2; python_version >= '3.12'",
+    "numpy >= 1.18; python_version < '3.12'",
+    "numpy >= 1.26; python_version >= '3.12'",
+    "rustfrc >= 1.1.5",
 ]
 
-[tool.poetry.urls]
+[project.urls]
 "Source Code" = "https://github.com/tmtenbrink/frc"
 
-[tool.poetry.dependencies]
-python = ">=3.8, <3.13"
-diplib = "^3.1.0"
-scipy = [
-    {version = "^1.3.2", python = "<3.12"},
-    {version = "^1.11.2", python = ">=3.12"}
+[dependency-groups]
+dev = [
+    "pytest >= 9.0.3; python_version >= '3.10'",
+    "pytest >= 8.4.2; python_version == '3.9'",
+    "pytest >= 8.3.5; python_version < '3.9'",
 ]
-numpy = [
-    {version = "^1.18", python = "<3.12"},
-    {version = "^1.26", python = ">=3.12"}
-]
-rustfrc = [
-    {version = "^1.1.5", python = "<3.12"},
-    {version = "^1.1.5", python = ">=3.12"}
-]
-
-[tool.poetry.dev-dependencies]
-pytest = "^8.1.1"
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["uv_build >= 0.13.5, < 0.14"]
+build-backend = "uv_build"
+
+[tool.uv]
+# Resolve to versions with wheels on the platforms CI and most users run on
+required-environments = [
+    "sys_platform == 'linux' and platform_machine == 'x86_64'",
+    "sys_platform == 'darwin' and platform_machine == 'arm64'",
+    "sys_platform == 'win32' and platform_machine == 'AMD64'",
+]
+# diplib 3.6 has no wheels for Python 3.10 and older
+constraint-dependencies = ["diplib < 3.6; python_version < '3.11'"]
