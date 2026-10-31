@@ -15,9 +15,6 @@ required-markers = [
     "platform_machine == 'AMD64' and sys_platform == 'win32'",
 ]
 
-[manifest]
-constraints = [{ name = "diplib", marker = "python_full_version < '3.11'", specifier = "<3.6" }]
-
 [[package]]
 name = "colorama"
 version = "0.4.6"
@@ -32,38 +29,29 @@ name = "diplib"
 version = "3.4.3"
 source = { registry = "https://pypi.org/simple" }
 resolution-markers = [
+    "python_full_version < '3.9' and sys_platform == 'win32'",
     "python_full_version < '3.9' and sys_platform != 'win32'",
 ]
 wheels = [
     { url = "https://files.pythonhosted.org/packages/c1/00/4385f2ffc7bf77a89fe47f66fba9cda6fe09626e375c3b31a9555b04e8e6/diplib-3.4.3-cp310-cp310-macosx_12_0_x86_64.whl", hash = "sha256:283c330ab5a2a8b720455711e3dd2679aad865bb22137ea77bd2435a3a2d3fbf", size = 7552150, upload-time = "2024-03-21T15:15:19.735Z" },
     { url = "https://files.pythonhosted.org/packages/0c/87/794e870df0a0005511f2b6ac360747321dc9e12cc6da0a5f05e255107ca6/diplib-3.4.3-cp310-cp310-macosx_14_0_arm64.whl", hash = "sha256:02a004ee07f654b68a25a382d89569bd46fbebbef40684d6ec780a9a7219d090", size = 5754405, upload-time = "2024-03-21T15:28:37.839Z" },
     { url = "https://files.pythonhosted.org/packages/4e/dc/f79ca0476e38b76d54b8ceb9312b90a811f788431af06096aa3b79d663b4/diplib-3.4.3-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:3ef483ed7365a09ba347577c1068a2b7defd00988814b38181fd056ba71dcc57", size = 7999922, upload-time = "2024-03-21T15:14:54.023Z" },
+    { url = "https://files.pythonhosted.org/packages/33/0f/5c7594bb59d8b4a25ca5d5be96df101a892322ee7ff96825ca477f6d3a55/diplib-3.4.3-cp310-cp310-win_amd64.whl", hash = "sha256:3f6d162a30e14d92a3b86ec25728926e996520171d3c69395362ec30fe0bfbbc", size = 5113627, upload-time = "2024-03-21T15:17:21.362Z" },
     { url = "https://files.pythonhosted.org/packages/4a/23/e976eb1a994db07c8e39389f50d20dab0038c5dddab29b4bc8b79bea37ce/diplib-3.4.3-cp311-cp311-macosx_12_0_x86_64.whl", hash = "sha256:9718e1770eda3a94d6d95090a8aebb41922925cbf67feb35c4a37146ef088d0b", size = 7552116, upload-time = "2024-03-21T15:15:21.465Z" },
     { url = "https://files.pythonhosted.org/packages/38/60/a67c3261fd8e950d2614a4f8875ca826bfed3c41f2685c9bc943dc0ec1e5/diplib-3.4.3-cp311-cp311-macosx_14_0_arm64.whl", hash = "sha256:73d48b27e931c92d61678fd49e3ad69f4ce9daa9abb98e3f468e76a7944042de", size = 5754340, upload-time = "2024-03-21T15:28:43.338Z" },
     { url = "https://files.pythonhosted.org/packages/c2/da/b1123c15f48082089e4b1e552d8774c0f3819483eca869399d73e6dd9bbb/diplib-3.4.3-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:1eaee0afe56793407d749515c23a7d6608add230db1c08f8dbc385c27a356852", size = 7999023, upload-time = "2024-03-21T15:14:56.932Z" },
+    { url = "https://files.pythonhosted.org/packages/e6/6c/e0591b55e9972ce3ac04a0883127ebb5b99b35c05a9759b4333b03cd58e7/diplib-3.4.3-cp311-cp311-win_amd64.whl", hash = "sha256:f1cf628ffb3a24a56bc4b61b194ec2a0a02e5eb7df49810f1a363e3f50f303a8", size = 5113026, upload-time = "2024-03-21T15:17:23.316Z" },
     { url = "https://files.pythonhosted.org/packages/bc/b7/fa99bc13633cef9ca3d9006d7a5c4a63a382446f4d0698e9a0fed7669c4c/diplib-3.4.3-cp312-cp312-macosx_12_0_x86_64.whl", hash = "sha256:a0a2d57470a355cb9bd58abef9ccaabdcfbcb9da6663c2be994d933814cc4d94", size = 7588323, upload-time = "2024-03-21T15:15:23.178Z" },
     { url = "https://files.pythonhosted.org/packages/3a/d1/46f1cbaede9d8ca403966ad0bb8a09e5d1241cf51cf389e88e41ce15cd08/diplib-3.4.3-cp312-cp312-macosx_14_0_arm64.whl", hash = "sha256:64ef07d86f5d0771af1bd81b2ab1cd321baf16acc725f72a9eb62bd94ac65b05", size = 5773649, upload-time = "2024-03-21T15:28:47.518Z" },
     { url = "https://files.pythonhosted.org/packages/0c/c5/71e75ce96b83236f6e63ab21f10ef5f10ae6a51e6ce4348c0eeb96d2bad4/diplib-3.4.3-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:8dcfcef92d03705dd50ec927fd03dcbda4875e1e385f07fa300fe76ff3eb285d", size = 8004932, upload-time = "2024-03-21T15:14:58.726Z" },
+    { url = "https://files.pythonhosted.org/packages/06/5a/aac1baba48bb4e9f8eaadccdff1a466bf70a82f1965b7351c80f04d57f92/diplib-3.4.3-cp312-cp312-win_amd64.whl", hash = "sha256:1027af746a9707752005dc766c6ed64d3dd1bc9c49b3c26af6383b67cc2f156c", size = 5118270, upload-time = "2024-03-21T15:17:24.746Z" },
     { url = "https://files.pythonhosted.org/packages/3b/64/6520f8c8045f2aef084e34a2a5d08dae47702f29c00bb45c11ef2ace126f/diplib-3.4.3-cp38-cp38-macosx_12_0_x86_64.whl", hash = "sha256:82b701a1d9a948a0d8cccfbd80405322e02e0b5e1c21062b51a4bd675206287c", size = 7552341, upload-time = "2024-03-21T15:15:24.876Z" },
     { url = "https://files.pythonhosted.org/packages/40/8c/5137a00f5614c211539d8df3f2333a7c41795a3d182014206145a12d1502/diplib-3.4.3-cp38-cp38-macosx_14_0_arm64.whl", hash = "sha256:38510de597f06132e53ec567a918c8f2fd7207bee7d63bbdb0300a09afe9d394", size = 5754292, upload-time = "2024-03-21T15:28:51.779Z" },
     { url = "https://files.pythonhosted.org/packages/fd/ec/a62606fef299f4578df968332124e33f0a1c2954629e1542ea773632fbea/diplib-3.4.3-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:5698a5a008e2189c273a4414d255394177c7180a0c3bf26e10f8bd6504b2218a", size = 7998770, upload-time = "2024-03-21T15:15:02.016Z" },
+    { url = "https://files.pythonhosted.org/packages/f1/55/cfe13fbad3289e69310c92e053049e9891486fcce01c8480a77d43f17f9f/diplib-3.4.3-cp38-cp38-win_amd64.whl", hash = "sha256:3dbef073066c2d3571573222aab8082f8825612afbf6b1e6c94f893e05052e56", size = 5113346, upload-time = "2024-03-21T15:17:26.26Z" },
     { url = "https://files.pythonhosted.org/packages/c8/91/f0da78d301b6a0a7eaa561522bfd7dd63b7a40457d17ff593a52d4105d4c/diplib-3.4.3-cp39-cp39-macosx_12_0_x86_64.whl", hash = "sha256:4bfc708d5e45e7613f4ce63febdd75c917e525814d7460925f01cdbfc06caf6f", size = 7552776, upload-time = "2024-03-21T15:15:27.061Z" },
     { url = "https://files.pythonhosted.org/packages/0f/4a/e0db4ad69c19dd62c3b42f14a95e9508c86c03015d3145b19ac0d28b3a7f/diplib-3.4.3-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:44a22c5ecd6c9ed280ccd9b7d9f2c049c30807664a3d2286e2e3ae74d18381ec", size = 8000433, upload-time = "2024-03-21T15:15:04.585Z" },
-]
-
-[[package]]
-name = "diplib"
-version = "3.5.0"
-source = { registry = "https://pypi.org/simple" }
-resolution-markers = [
-    "python_full_version < '3.9' and sys_platform == 'win32'",
-]
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/4f/f4/c408b7c30593abde2a955bc8af52cf0d14723f10b84926a4601745aea7af/diplib-3.5.0-cp310-cp310-win_amd64.whl", hash = "sha256:2cff25c438151fbab2f7c91875e880a5ce767c3526ec2f336e5fee3366bb399a", size = 5294302, upload-time = "2024-06-18T05:08:52.901Z" },
-    { url = "https://files.pythonhosted.org/packages/0c/39/d452c8cf0b0786ea53ad168e3d4db4f274cae7f6563fe0c3eda5399297a7/diplib-3.5.0-cp311-cp311-win_amd64.whl", hash = "sha256:a0d3936d1c433934d7e18da188c461638e22126cb2098abe3329085693bf01c6", size = 5298430, upload-time = "2024-06-18T05:08:57.029Z" },
-    { url = "https://files.pythonhosted.org/packages/d4/0d/ed841422c61b7a6a983fed8068dbb00402f94c5e9e3ff1b0e6ee882efc11/diplib-3.5.0-cp312-cp312-win_amd64.whl", hash = "sha256:f8792e6a46a8bf47c367265265cf886b00a3c1ad60208bb2299c39c492c0a3b4", size = 5301931, upload-time = "2024-06-18T05:09:03.212Z" },
-    { url = "https://files.pythonhosted.org/packages/cf/4d/6f2a3c8cba87287c01396bac4df44d94f692fa018eced607f4e8d539f81e/diplib-3.5.0-cp38-cp38-win_amd64.whl", hash = "sha256:93523c5dc215f4efbc5f7076735934c83ec79dd8e536deb9fbe4edc8e9852cf3", size = 5295463, upload-time = "2024-06-18T05:09:11.107Z" },
-    { url = "https://files.pythonhosted.org/packages/03/15/f132a205e076bdd08a4ffd7aa55a6d7eb209b1d20a61a33895bede5509b8/diplib-3.5.0-cp39-cp39-win_amd64.whl", hash = "sha256:605321b127e281f9a39f542c9f49845e87d199e9b07295eaa8c9a10725183746", size = 5295235, upload-time = "2024-06-18T05:09:15.022Z" },
+    { url = "https://files.pythonhosted.org/packages/54/48/fdc15f678fcac264ff012dbdc966d9c6e4c78983f100df640f3fb150cc30/diplib-3.4.3-cp39-cp39-win_amd64.whl", hash = "sha256:05cf1a0b36f5949e89c7309c9a2418494035afcbcca3e5d29880309d464122ce", size = 5116318, upload-time = "2024-03-21T15:17:27.737Z" },
 ]
 
 [[package]]
@@ -130,8 +118,7 @@ name = "frc"
 version = "0.1.2"
 source = { editable = "." }
 dependencies = [
-    { name = "diplib", version = "3.4.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.9' and sys_platform != 'win32'" },
-    { name = "diplib", version = "3.5.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.9' and sys_platform == 'win32'" },
+    { name = "diplib", version = "3.4.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.9'" },
     { name = "diplib", version = "3.5.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.9' and python_full_version < '3.11'" },
     { name = "diplib", version = "3.6.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
     { name = "numpy", version = "1.24.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.9'" },
@@ -156,7 +143,10 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "diplib", specifier = ">=3.1.0" },
+    { name = "diplib", marker = "python_full_version < '3.9'", specifier = ">=3.1.0,<3.5" },
+    { name = "diplib", marker = "python_full_version == '3.9.*'", specifier = ">=3.1.0,<3.5.2" },
+    { name = "diplib", marker = "python_full_version == '3.10.*'", specifier = ">=3.1.0,<3.6" },
+    { name = "diplib", marker = "python_full_version >= '3.11'", specifier = ">=3.1.0" },
     { name = "numpy", marker = "python_full_version < '3.12'", specifier = ">=1.18" },
     { name = "numpy", marker = "python_full_version >= '3.12'", specifier = ">=1.26" },
     { name = "rustfrc", specifier = ">=1.1.5" },
