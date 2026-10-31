@@ -3,8 +3,6 @@ on:
   push:
     branches: [ main ]
   pull_request:
-  release:
-    types: [ published ]
 
 permissions:
   contents: read
@@ -32,35 +30,3 @@ jobs:
         run: uv run --no-sync pytest
       - name: Build
         run: uv build
-      - name: Upload artifact
-        if: ${{ matrix.py-version == '3.12' }}
-        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
-        with:
-          name: dist
-          path: ${{ github.workspace }}/dist/
-          if-no-files-found: error
-  publish:
-    needs: [buildtest]
-    name: Wheel-Publish
-    permissions:
-      id-token: write
-    runs-on: ubuntu-latest
-    steps:
-    - name: Download artifact
-      uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
-      with:
-        name: dist
-        path: ${{ github.workspace }}/dist/
-    - name: Set up Python
-      uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
-      with:
-        python-version: '3.12'
-    - name: Install wheel test
-      run: |
-        pip install ${{ github.workspace }}/dist/*.whl
-    - name: Publish a Python distribution to PyPI
-      if: ${{ github.event_name == 'release' && github.event.action == 'published' }}
-      uses: pypa/gh-action-pypi-publish@7245906fb61fa33a13554f9d5fb856fe61758086 # v1.14.3
-      with:
-        user: __token__
-        password: ${{ secrets.PYPI_API_TOKEN }}
