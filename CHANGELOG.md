@@ -4,7 +4,7 @@
 
 ### Fixed
 
-- `half_bit_threshold` and `frc_res(..., threshold="half_bit")` no longer fail with `module 'numpy' has no attribute 'int'` on NumPy 1.24 and newer ([#3](https://github.com/tmtenbrink/frc/issues/3)).
+- `half_bit_threshold` and `frc_res(..., threshold="half_bit")` no longer fail with `module 'numpy' has no attribute 'int'` on NumPy 1.24 and newer ([#3](https://github.com/tiptenbrink/frc/issues/3)).
 - On Python 3.8-3.10, DIPlib is capped at the last release with wheels for that Python, so installers no longer pick a DIPlib they cannot install.
 - The license metadata says MIT, as `LICENSE` does.
 
