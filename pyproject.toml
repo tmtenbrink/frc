@@ -23,7 +23,7 @@ dependencies = [
 ]
 
 [project.urls]
-"Source Code" = "https://github.com/tmtenbrink/frc"
+"Source Code" = "https://github.com/tiptenbrink/frc"
 
 [dependency-groups]
 dev = [
