@@ -17,10 +17,11 @@ on:
 permissions: {}
 jobs:
   touchgate:
-    uses: borink-org/touchgate/.github/workflows/touchgate.yml@75e5c009cf817ec0b09f05513a1ddd4f83eef1ac
+    uses: borink-org/touchgate/.github/workflows/touchgate.yml@4ae21d2cb8ae60b1fbede70a92ec2fa65ce02c3d
     permissions:
       contents: write
       pull-requests: write
       actions: write
     with:
       version: ${{ inputs.version }}
+      from-source: true
