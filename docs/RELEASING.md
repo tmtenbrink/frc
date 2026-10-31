@@ -11,7 +11,7 @@ frc is released to PyPI by `.github/workflows/release.yml`, with Trusted Publish
    gh workflow run release.yml --ref publish -f commit=(git rev-parse HEAD)
    ```
 
-3. The workflow checks that the commit is on `main`, that the version and the newest changelog section agree and that the version is not tagged yet. It waits for every check on the commit to pass, builds the sdist and the wheel, publishes them to PyPI, and only then tags the commit `v<version>` and makes the GitHub release with the changelog section and the built files.
+3. The workflow checks that the commit is on `main`, that the version and the newest changelog section agree and that the version is not tagged yet. It waits for every check on the commit to pass, builds the sdist and the wheel, signs PEP 740 attestations for them, publishes both to PyPI, and only then tags the commit `v<version>` and makes the GitHub release with the changelog section and the built files.
 
 A release that failed halfway can run again: the upload skips what PyPI has already.
 
