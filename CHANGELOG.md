@@ -11,7 +11,7 @@
 ### Changed
 
 - NumPy, SciPy, DIPlib and rustfrc no longer have an upper version bound, so NumPy 2 is allowed.
-- Releases are approved with a security key through [touchgate](https://github.com/borink-org/touchgate) and published with Trusted Publishing and PEP 740 attestations. See `docs/RELEASING.md`.
+- Releases are approved with a security key through [touchgate](https://github.com/borink-org/touchgate) and published with Trusted Publishing and PEP 740 attestations.
 
 ## 0.1.1 - 2024-04-03
 

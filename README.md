@@ -88,3 +88,7 @@ For images with a significant amount of non-Poisson noise, the 1FRC method has b
 ### Development
 
 frc uses [uv](https://github.com/astral-sh/uv). Run `uv sync` to create a virtual environment with the (development) dependencies, `uv run pytest` to run the tests and `uv build` to build the package.
+
+### Releasing
+
+Releases go through [touchgate](https://github.com/borink-org/touchgate), whose README describes the process: start the `touchgate` workflow with the version, approve the pull request it opens with `touchgate approve`, and merge it. Every pull request adds a line under `## Unreleased` in `CHANGELOG.md`. `release.yml` only publishes from the `publish` branch, which only `tmtenbrink` can change; propose changes to it on `main` and ask them to apply them there.
