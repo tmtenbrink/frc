@@ -11,11 +11,13 @@ on:
   push:
     branches: [main]
   pull_request:
+    # The three default types, and a label change, so that adding no-changelog
+    # runs the changelog check again.
     types: [opened, synchronize, reopened, labeled, unlabeled]
 permissions: {}
 jobs:
   touchgate:
-    uses: borink-org/touchgate/.github/workflows/touchgate.yml@f6da2508d930df3bb712ab2132c26f9adf001ec0
+    uses: borink-org/touchgate/.github/workflows/touchgate.yml@755b2c31fd216cdf5ce5858acf6b5bb0aea4f5da
     permissions:
       contents: write
       pull-requests: write

@@ -19,11 +19,12 @@ permissions: {}
 
 env:
   # The touchgate commit the release runs, installed in each job that runs it.
-  TOUCHGATE_REV: f6da2508d930df3bb712ab2132c26f9adf001ec0
+  TOUCHGATE_REV: 755b2c31fd216cdf5ce5858acf6b5bb0aea4f5da
+  # The approval key `touchgate verify` checks the approval against.
   TOUCHGATE_KEY: sk-ssh-ed25519@openssh.com AAAAGnNrLXNzaC1lZDI1NTE5QG9wZW5zc2guY29tAAAAIPK8VZox0UVPB1gsQowDPXlOj1Z34IIJ3V4I2chFNYONAAAAC3NzaDpzaWduaW5n release key
   # The uv that builds and uploads the release, checked against the checksum
   # setup-uv knows for it. A package built with uv_build builds with the copy
-  # in this uv, which `touchgate check-backend` checks.
+  # in this uv, which `touchgate check --build` checks.
   UV_VERSION: 0.13.6
 
 jobs:
@@ -43,14 +44,9 @@ jobs:
           ref: ${{ github.event.repository.default_branch }}
           fetch-depth: 0
           persist-credentials: false
-      - name: Check the approval
-        env:
-          COMMIT: ${{ inputs.commit }}
-          BRANCH: origin/${{ github.event.repository.default_branch }}
-          WORKFLOW_COMMIT: ${{ github.workflow_sha }}
-        run: >-
-          touchgate verify --repo . --commit "$COMMIT" --branch "$BRANCH"
-          --key "$TOUCHGATE_KEY" --workflow-commit "$WORKFLOW_COMMIT"
+      # Reads the commit, the default branch and this workflow's commit from
+      # the run, and the key from TOUCHGATE_KEY.
+      - run: touchgate verify
 
   # The commit is approved from here on, so building it is safe. The build
   # runs apart from the job that can get a PyPI token.
@@ -72,8 +68,7 @@ jobs:
         with:
           version: ${{ env.UV_VERSION }}
           enable-cache: false
-      - run: touchgate check
-      - run: touchgate check-backend
+      - run: touchgate check --build
       - run: uv build --out-dir dist
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
@@ -92,12 +87,9 @@ jobs:
       - name: Install touchgate
         working-directory: ${{ runner.temp }}
         run: cargo install --locked --git https://github.com/borink-org/touchgate --rev "$TOUCHGATE_REV" touchgate
-      - name: Wait for every check on the merge to pass
+      - run: touchgate wait-for-checks
         env:
-          COMMIT: ${{ inputs.commit }}
           GH_TOKEN: ${{ github.token }}
-          GH_REPO: ${{ github.repository }}
-        run: touchgate wait-for-checks --commit "$COMMIT"
 
   # Builds nothing from the commit: it checks the built files are this
   # version's, signs their attestations and uploads them.
@@ -149,8 +141,6 @@ jobs:
         with:
           name: dist
           path: dist
-      - name: Tag the release and make a GitHub release
+      - run: touchgate github-release dist/*
         env:
-          COMMIT: ${{ inputs.commit }}
           GH_TOKEN: ${{ github.token }}
-        run: touchgate github-release --commit "$COMMIT" dist/*

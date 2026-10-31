@@ -40,4 +40,4 @@ The release is only as safe as these settings. They are made by `tmtenbrink`, th
 
 `release.yml` and `touchgate.yml` run touchgate at a pinned commit, and `release.yml` holds the public release key and the uv version, `UV_VERSION`, that builds and uploads the release. Changing any of them in `release.yml` is a change to the `publish` branch, so `tmtenbrink` makes it, after reading what a new touchgate commit or uv release changes.
 
-frc builds with `uv_build`, and uv builds with the copy built into itself only when the `uv_build` range in `pyproject.toml` holds its version; otherwise it downloads one from PyPI. `touchgate check-backend` refuses to build in that case, so when `UV_VERSION` moves past the range, widen the range in the same change.
+frc builds with `uv_build`, and uv builds with the copy built into itself only when the `uv_build` range in `pyproject.toml` holds its version; otherwise it downloads one from PyPI. `touchgate check --build` refuses to build in that case, so when `UV_VERSION` moves past the range, widen the range in the same change.
