@@ -19,7 +19,7 @@ permissions: {}
 
 env:
   # The touchgate commit the release runs, installed in each job that runs it.
-  TOUCHGATE_REV: 755b2c31fd216cdf5ce5858acf6b5bb0aea4f5da
+  TOUCHGATE_REV: b144a20d09e15df80671bc82b117e3bcd3a95185
   # The approval key `touchgate verify` checks the approval against.
   TOUCHGATE_KEY: sk-ssh-ed25519@openssh.com AAAAGnNrLXNzaC1lZDI1NTE5QG9wZW5zc2guY29tAAAAIPK8VZox0UVPB1gsQowDPXlOj1Z34IIJ3V4I2chFNYONAAAAC3NzaDpzaWduaW5n release key
   # The uv that builds and uploads the release, checked against the checksum

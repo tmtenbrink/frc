@@ -1,6 +1,6 @@
 # Releasing
 
-frc is released to PyPI with [touchgate](https://github.com/borink-org/touchgate): a release publishes only after it was approved with the release key, a FIDO2 security key, by touch and PIN. Its README describes the process and what it guarantees; this file records how this repository is set up for it. `touchgate.json` tells touchgate that frc is a Python package for PyPI.
+frc is released to PyPI with [touchgate](https://github.com/borink-org/touchgate): a release publishes only after it was approved with the release key, a FIDO2 security key, by touch and PIN. Its README describes the process and what it guarantees; this file records how this repository is set up for it. touchgate releases frc to PyPI because `pyproject.toml` has a `[project]` table.
 
 ## A release
 
