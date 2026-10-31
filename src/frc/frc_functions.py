@@ -172,7 +172,7 @@ def half_bit_threshold(img_size: int) -> Func1D:
     def half_bit_thres_f(x):
         """ Maps a number x (0 to 1) to threshold value for FRC value for pixel
         value (0 to img_size) """
-        indexes = np.array(x * img_size).astype(np.int)
+        indexes = np.array(x * img_size).astype(int)
         return half_bit_thres[indexes]
 
     return half_bit_thres_f
