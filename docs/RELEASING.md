@@ -38,4 +38,6 @@ The release is only as safe as these settings. They are made by `tmtenbrink`, th
 - Immutable releases are on, GitHub Actions may create pull requests, merge commits are allowed, and a `no-changelog` label exists.
 - On PyPI, `frc` trusts only the workflow `release.yml` of `tmtenbrink/frc` in the environment `release`. No PyPI API token for the project exists, and the repository has no `PYPI_API_TOKEN` secret.
 
-`release.yml` and `touchgate.yml` run touchgate at a pinned commit, and `release.yml` holds the public release key. Changing either in `release.yml` is a change to the `publish` branch, so `tmtenbrink` makes it, after reading what a new touchgate commit changes.
+`release.yml` and `touchgate.yml` run touchgate at a pinned commit, and `release.yml` holds the public release key and the uv version, `UV_VERSION`, that builds and uploads the release. Changing any of them in `release.yml` is a change to the `publish` branch, so `tmtenbrink` makes it, after reading what a new touchgate commit or uv release changes.
+
+frc builds with `uv_build`, and uv builds with the copy built into itself only when the `uv_build` range in `pyproject.toml` holds its version; otherwise it downloads one from PyPI. `touchgate check-backend` refuses to build in that case, so when `UV_VERSION` moves past the range, widen the range in the same change.

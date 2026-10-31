@@ -15,7 +15,7 @@ on:
 permissions: {}
 jobs:
   touchgate:
-    uses: borink-org/touchgate/.github/workflows/touchgate.yml@937d5d7137f6333cd1b13ccb56f8f81cfce518af
+    uses: borink-org/touchgate/.github/workflows/touchgate.yml@f6da2508d930df3bb712ab2132c26f9adf001ec0
     permissions:
       contents: write
       pull-requests: write

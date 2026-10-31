@@ -19,8 +19,12 @@ permissions: {}
 
 env:
   # The touchgate commit the release runs, installed in each job that runs it.
-  TOUCHGATE_REV: 937d5d7137f6333cd1b13ccb56f8f81cfce518af
+  TOUCHGATE_REV: f6da2508d930df3bb712ab2132c26f9adf001ec0
   TOUCHGATE_KEY: sk-ssh-ed25519@openssh.com AAAAGnNrLXNzaC1lZDI1NTE5QG9wZW5zc2guY29tAAAAIPK8VZox0UVPB1gsQowDPXlOj1Z34IIJ3V4I2chFNYONAAAAC3NzaDpzaWduaW5n release key
+  # The uv that builds and uploads the release, checked against the checksum
+  # setup-uv knows for it. A package built with uv_build builds with the copy
+  # in this uv, which `touchgate check-backend` checks.
+  UV_VERSION: 0.13.6
 
 jobs:
   # Checks the approval without running anything from the commit: touchgate
@@ -66,8 +70,10 @@ jobs:
           persist-credentials: false
       - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
         with:
+          version: ${{ env.UV_VERSION }}
           enable-cache: false
       - run: touchgate check
+      - run: touchgate check-backend
       - run: uv build --out-dir dist
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
@@ -120,6 +126,7 @@ jobs:
           path: dist
       - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
         with:
+          version: ${{ env.UV_VERSION }}
           enable-cache: false
       - run: touchgate publish dist
 
