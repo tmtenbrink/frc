@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+
+- Releases upload PEP 740 attestations, so PyPI shows the workflow that built and published each file. 0.1.2 was published without them.
+
 ## 0.1.2 - 2026-10-31
 
 ### Fixed

@@ -91,4 +91,10 @@ frc uses [uv](https://github.com/astral-sh/uv). Run `uv sync` to create a virtua
 
 ### Releasing
 
-Releases go through [touchgate](https://github.com/borink-org/touchgate), whose README describes the process: start the `touchgate` workflow with the version, approve the pull request it opens with `touchgate approve`, and merge it. Every pull request adds a line under `## Unreleased` in `CHANGELOG.md`. `release.yml` only publishes from the `publish` branch: a change to it goes on `main` and is copied to `publish` by the repository owner.
+Releases go through [touchgate](https://github.com/borink-org/touchgate):
+
+1. Start the `touchgate` workflow with the version.
+2. Approve the pull request that it opens with `touchgate approve`.
+3. Merge the pull request.
+
+Every pull request adds a line under `## Unreleased` in `CHANGELOG.md`. `release.yml` publishes only from the `publish` branch. A change to it goes on `main`, and the repository owner copies it to `publish`.
