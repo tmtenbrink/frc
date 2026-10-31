@@ -1,6 +1,6 @@
 [project]
 name = "frc"
-version = "0.1.2"
+version = "0.1.1"
 description = "Library for computing Fourier Ring Correlation (FRC) curves and using them to determine image resolution."
 authors = [
     {name = "Tip ten Brink", email = "tip@tenbrinkmeijs.com"},

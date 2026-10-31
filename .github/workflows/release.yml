@@ -1,170 +1,115 @@
-# The release. The copy on the publish branch is the one that runs and the
-# one PyPI trusts; see docs/RELEASING.md.
+# The release, started by the touchgate workflow once a merge brings in an
+# approval. The copy on the publish branch is the one that runs and the one
+# PyPI trusts; see docs/RELEASING.md.
 #
-# Started by hand with the full SHA of a commit on main. It checks that the
-# commit's version and changelog agree, waits for the commit's CI, builds the
-# package, publishes it to PyPI, and only then tags the commit and makes the
-# GitHub release, so a tag always names a published release.
+# Every step that does more than build or upload is a touchgate command. The
+# job that publishes is defined here, not in a reusable workflow, because PyPI
+# trusts this file in the `release` environment and the attestations name it.
 name: release
 
 on:
   workflow_dispatch:
     inputs:
       commit:
-        description: The full SHA of the commit on main to release
+        description: The merge commit of the release, on the default branch
         required: true
         type: string
 
 permissions: {}
 
+env:
+  # The touchgate commit the release runs, installed in each job that runs it.
+  TOUCHGATE_REV: 8fb9711eb45c11d1b06b29ca4773d275f585673f
+  TOUCHGATE_KEY: sk-ssh-ed25519@openssh.com AAAAGnNrLXNzaC1lZDI1NTE5QG9wZW5zc2guY29tAAAAIPK8VZox0UVPB1gsQowDPXlOj1Z34IIJ3V4I2chFNYONAAAAC3NzaDpzaWduaW5n release key
+
 jobs:
-  # Runs nothing from the commit: it reads files from it with git alone.
-  check:
-    name: Check the commit
+  # Checks the approval without running anything from the commit: touchgate
+  # is built before the checkout, and reads the commit with git alone.
+  verify:
+    name: Check the approval
     runs-on: ubuntu-latest
     permissions:
-      contents: read # to fetch main and its tags
-    outputs:
-      version: ${{ steps.version.outputs.version }}
+      contents: read # to fetch the default branch
     steps:
+      - name: Install touchgate
+        working-directory: ${{ runner.temp }}
+        run: cargo install --locked --git https://github.com/borink-org/touchgate --rev "$TOUCHGATE_REV" touchgate
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ github.event.repository.default_branch }}
           fetch-depth: 0
           persist-credentials: false
-      - name: Check that the commit is on main and not yet released
-        id: version
+      - name: Check the approval
         env:
           COMMIT: ${{ inputs.commit }}
           BRANCH: origin/${{ github.event.repository.default_branch }}
-        run: |
-          set -euo pipefail
-          if ! [[ "$COMMIT" =~ ^[0-9a-f]{40}$ ]]; then
-            echo "the commit must be a full 40-character SHA" >&2
-            exit 1
-          fi
-          git merge-base --is-ancestor "$COMMIT" "$BRANCH" || {
-            echo "$COMMIT is not on $BRANCH" >&2
-            exit 1
-          }
-          python=$(git show "$COMMIT:pyproject.toml" | sed -n 's/^version = "\(.*\)"$/\1/p' | head -n1)
-          changelog=$(git show "$COMMIT:CHANGELOG.md" | sed -n 's/^## \([^ ]*\).*$/\1/p' | head -n1)
-          echo "pyproject.toml: $python, CHANGELOG.md: $changelog"
-          if [[ -z "$python" || "$python" != "$changelog" ]]; then
-            echo "the version in pyproject.toml and the newest changelog section must agree" >&2
-            exit 1
-          fi
-          if git rev-parse -q --verify "refs/tags/v$python" > /dev/null; then
-            echo "v$python is tagged already" >&2
-            exit 1
-          fi
-          echo "version=$python" >> "$GITHUB_OUTPUT"
+          WORKFLOW_COMMIT: ${{ github.workflow_sha }}
+        run: >-
+          touchgate verify --repo . --commit "$COMMIT" --branch "$BRANCH"
+          --key "$TOUCHGATE_KEY" --workflow-commit "$WORKFLOW_COMMIT"
 
-  # Publishes only once every check on the commit has passed: ci.yml, run by
-  # the push to main.
-  checks:
-    name: Wait for the commit's checks
-    needs: check
-    runs-on: ubuntu-latest
-    permissions:
-      checks: read # to read the commit's check runs
-    steps:
-      - name: Wait for every check on the commit to pass
-        env:
-          COMMIT: ${{ inputs.commit }}
-          GH_TOKEN: ${{ github.token }}
-          GH_REPO: ${{ github.repository }}
-        run: |
-          set -euo pipefail
-          deadline=$((SECONDS + 3600))
-          while :; do
-            runs=$(gh api --paginate "repos/$GH_REPO/commits/$COMMIT/check-runs" \
-              --jq '.check_runs[] | "\(.status) \(.conclusion // "-") \(.name)"')
-            echo "$runs"
-            if [[ -n "$runs" ]]; then
-              if grep -Ev '^completed (success|skipped|neutral) ' <<< "$runs" | grep -q '^completed '; then
-                echo "a check on $COMMIT failed" >&2
-                exit 1
-              fi
-              if ! grep -qv '^completed ' <<< "$runs"; then
-                break
-              fi
-            fi
-            if (( SECONDS > deadline )); then
-              echo "the checks on $COMMIT did not finish within an hour" >&2
-              exit 1
-            fi
-            sleep 30
-          done
-
-  # Builds apart from the job that can get a PyPI token: every step of a job
-  # allowed `id-token: write` can ask for that token, and building runs the
-  # build backend.
+  # The commit is approved from here on, so building it is safe. The build
+  # runs apart from the job that can get a PyPI token.
   build:
-    name: Build the package
-    needs: check
+    name: Build the release
+    needs: verify
     runs-on: ubuntu-latest
     permissions:
       contents: read # to check out the release
     steps:
+      - name: Install touchgate
+        working-directory: ${{ runner.temp }}
+        run: cargo install --locked --git https://github.com/borink-org/touchgate --rev "$TOUCHGATE_REV" touchgate
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ inputs.commit }}
           persist-credentials: false
       - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
         with:
-          python-version: '3.12'
           enable-cache: false
-      - name: Build the sdist and the wheel
-        run: uv build --out-dir dist
-      - name: Check that the wheel installs and imports
-        run: |
-          uv venv "$RUNNER_TEMP/check"
-          VIRTUAL_ENV="$RUNNER_TEMP/check" uv pip install dist/*.whl
-          "$RUNNER_TEMP/check/bin/python" -c "import frc"
+      - run: touchgate check
+      - run: uv build --out-dir dist
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: dist
           path: dist
           retention-days: 7
 
-  # Builds nothing: it uploads what the build job built.
+  # Publishes only once every check on the merge commit has passed.
+  checks:
+    name: Wait for the merge's checks
+    needs: verify
+    runs-on: ubuntu-latest
+    permissions:
+      checks: read # to read the merge commit's check runs
+    steps:
+      - name: Install touchgate
+        working-directory: ${{ runner.temp }}
+        run: cargo install --locked --git https://github.com/borink-org/touchgate --rev "$TOUCHGATE_REV" touchgate
+      - name: Wait for every check on the merge to pass
+        env:
+          COMMIT: ${{ inputs.commit }}
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: touchgate wait-for-checks --commit "$COMMIT"
+
+  # Builds nothing from the commit: it checks the built files are this
+  # version's, signs their attestations and uploads them.
   publish:
     name: Publish to PyPI
-    needs: [check, checks, build]
+    needs: [build, checks]
     runs-on: ubuntu-latest
     environment: release
     concurrency:
-      group: release-publish
+      group: touchgate-publish
       cancel-in-progress: false
     permissions:
+      contents: read # to check out the release
       id-token: write # for PyPI trusted publishing and the attestations
     steps:
-      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
-        with:
-          name: dist
-          path: dist
-      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
-        with:
-          enable-cache: false
-      # Signs each file with this job's identity, as PEP 740 attestations
-      # that uv publish uploads with it. --exclude-newer freezes the versions
-      # of pypi-attestations' dependencies, since this job can get a PyPI
-      # token.
-      - name: Sign the attestations
-        run: uvx --exclude-newer 2026-10-31T00:00:00Z pypi-attestations@0.0.30 sign dist/*
-      # Skips what is on PyPI already, so a release that failed halfway can
-      # run again.
-      - name: Upload to PyPI
-        run: uv publish --trusted-publishing always --check-url https://pypi.org/simple/ dist/*
-
-  github-release:
-    name: Tag and release on GitHub
-    needs: [check, publish]
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write # to create the tag and the release
-    steps:
+      - name: Install touchgate
+        working-directory: ${{ runner.temp }}
+        run: cargo install --locked --git https://github.com/borink-org/touchgate --rev "$TOUCHGATE_REV" touchgate
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ inputs.commit }}
@@ -172,16 +117,33 @@ jobs:
       - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: dist
-          path: ${{ runner.temp }}/dist
-      - name: Tag the commit and make the GitHub release
+          path: dist
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with:
+          enable-cache: false
+      - run: touchgate publish dist
+
+  # Only now does the tag exist, so a tag always names a published release.
+  github-release:
+    name: Tag and release on GitHub
+    needs: publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # to create the tag and the release
+    steps:
+      - name: Install touchgate
+        working-directory: ${{ runner.temp }}
+        run: cargo install --locked --git https://github.com/borink-org/touchgate --rev "$TOUCHGATE_REV" touchgate
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.commit }}
+          persist-credentials: false
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: dist
+          path: dist
+      - name: Tag the release and make a GitHub release
         env:
           COMMIT: ${{ inputs.commit }}
-          VERSION: ${{ needs.check.outputs.version }}
           GH_TOKEN: ${{ github.token }}
-          GH_REPO: ${{ github.repository }}
-        run: |
-          set -euo pipefail
-          # The newest section of the changelog, without its heading.
-          awk 'section && /^## /{exit} /^## /{section=1; next} section' CHANGELOG.md > "$RUNNER_TEMP/notes.md"
-          gh release create "v$VERSION" "$RUNNER_TEMP"/dist/* \
-            --target "$COMMIT" --title "v$VERSION" --notes-file "$RUNNER_TEMP/notes.md"
+        run: touchgate github-release --commit "$COMMIT" dist/*
