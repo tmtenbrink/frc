@@ -93,8 +93,7 @@ frc uses [uv](https://github.com/astral-sh/uv). Run `uv sync` to create a virtua
 
 Releases go through [touchgate](https://github.com/borink-org/touchgate):
 
-1. Start the `touchgate` workflow with the version.
-2. Approve the pull request that it opens with `touchgate approve`.
-3. Merge the pull request.
+1. Run `touchgate prepare 0.2.0` on `main`, which dates `## Unreleased` and sets the version, then commit and push it.
+2. Run `touchgate approve` on the same day or the next. It asks for the security key's PIN and a touch, signs an approval of the tip of `main` and starts `release.yml` with it. The release waits for every check on that commit, publishes to PyPI, then makes the tag and the GitHub release.
 
 Every pull request adds a line under `## Unreleased` in `CHANGELOG.md`. `release.yml` publishes only from the `publish` branch. A change to it goes on `main`, and the repository owner copies it to `publish`.

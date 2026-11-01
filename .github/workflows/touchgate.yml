@@ -1,17 +1,18 @@
-# Prepares releases, checks the changelog and starts releases. Copy this file
-# to `.github/workflows/touchgate.yml` on the default branch. Replace the
-# commit in each install step with the commit of a touchgate release, and
-# `main` with your default branch if it has another name.
+# Prepares releases and checks the changelog. Copy this file to
+# `.github/workflows/touchgate.yml` on the default branch. Replace the commit
+# in each install step with the commit of a touchgate release, and `main`
+# with your default branch if it has another name.
 #
 # - Started by hand with a version, it prepares the release and opens a pull
-#   request.
+#   request, for a default branch that takes changes only through pull
+#   requests. Otherwise, run `touchgate prepare` yourself and push.
 # - On a push to the default branch and on a pull request, it checks the
 #   changelog. A pull request that changes what the project releases must add
-#   an entry under `## Unreleased`, unless it has the label `no-changelog`.
-# - On a push to the default branch that merges an approval, it starts
-#   `release.yml` on the `publish` branch.
+#   an entry under `## Unreleased`, unless it has the label `no-changelog`
+#   or prepares a release.
 #
-# Nothing here is trusted: `release.yml` checks the approval itself.
+# `touchgate approve` starts `release.yml` itself, so nothing here starts a
+# release.
 name: touchgate
 
 on:
@@ -44,7 +45,7 @@ jobs:
       contents: write # to push the release branch
       pull-requests: write # to open the pull request
     steps:
-      - uses: borink-org/touchgate/install@f40941fdd1c86e6ed277b3870aaafdb891251dbe # v0.1.0
+      - uses: borink-org/touchgate/install@c8b416115b3395d5a91ae4a465d794ca437bc354 # v0.2.0
       # The credentials stay, to push the release branch. They can do no more
       # than anyone who can start this workflow.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1 # zizmor: ignore[artipacked]
@@ -69,7 +70,7 @@ jobs:
     permissions:
       contents: read # to check out the history
     steps:
-      - uses: borink-org/touchgate/install@f40941fdd1c86e6ed277b3870aaafdb891251dbe # v0.1.0
+      - uses: borink-org/touchgate/install@c8b416115b3395d5a91ae4a465d794ca437bc354 # v0.2.0
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
@@ -79,27 +80,6 @@ jobs:
         if: >-
           github.event_name == 'pull_request'
           && !contains(github.event.pull_request.labels.*.name, 'no-changelog')
-          && !startsWith(github.head_ref, 'release/')
         env:
           BASE: origin/${{ github.base_ref }}
         run: 'touchgate check-entry "$BASE"'
-
-  start:
-    name: Start the release
-    if: >-
-      github.event_name == 'push'
-      && github.ref_name == github.event.repository.default_branch
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read # to read the merge
-      actions: write # to start release.yml
-    steps:
-      - uses: borink-org/touchgate/install@f40941fdd1c86e6ed277b3870aaafdb891251dbe # v0.1.0
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          fetch-depth: 2
-          persist-credentials: false
-      - name: Start the release if this push merges an approval
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: 'touchgate start --commit "$GITHUB_SHA"'
