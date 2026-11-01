@@ -6,88 +6,48 @@
 #                                   TU Delft
 # Tip ten Brink
 
-import rustfrc as r_frc
-from frc.deps_types import Img, np, dip, Callable, Optional, Func1D, Union, Tuple
+import rustfrc
+from frc.deps_types import Img, np, Optional, Func1D, Union, Tuple
 import frc._internal_utility as _util
 import frc.utility as frc_util
 
 __all__ = ['one_frc', 'two_frc', 'frc_res']
 
 
-def _frc(img1: dip.Image, img2: dip.Image) -> np.ndarray:
-    """
-    Internal function to perform Fourier Ring Correlation on a 2D dip.Image.
-    Arguments img1 and img2 are assumed to be of the same dimensions and
-    square. Do not use this function directly, but use two_frc or one_frc.
-
-    See below paper for FRC formula.
-    Van Heel, M. (1987). Similarity measures between images.
-    Ultramicroscopy, 21(1), 95–100. doi:10.1016/0304-3991(87)90010-6
-
-    :param img1: dip.Image representing the first image.
-    :param img2: dip.Image representing the second image.
-    :return: A 1D array with the FRC value for Fourier ring, with the index
-    representing the pixel distance from the origin.
-    """
-    axis_size = img1.Size(0)
-
-    # Fourier transformation of each image
-    fourier1 = dip.FourierTransform(img1, set(""))
-    fourier2 = dip.FourierTransform(img2, set(""))
-
-    # Numerator of the FRC formula
-    frc_num = np.real(dip.RadialSum(fourier1 * dip.Conjugate(fourier2), None))
-    frc_denom1 = dip.RadialSum(r_frc.sqr_abs(np.array(fourier1).astype(np.complex64)), None)
-    frc_denom2 = dip.RadialSum(r_frc.sqr_abs(np.array(fourier2).astype(np.complex64)), None)
-    frc_denom_prod = frc_denom1 * frc_denom2
-    frc_denom = np.sqrt(frc_denom_prod)
-    frc = frc_num / frc_denom
-
-    # Find last sensible FRC value (beyond axis_size / 2 there are no full
-    # rings)
-    circle_edge = int(axis_size / 2)
-
-    return frc[:circle_edge]
-
-
 def two_frc(img1: Img, img2: Img) -> np.ndarray:
     """
-    Standard FRC using two input images, which can be either DIP images or
-    NumPy arrays. Input images must be square, have equal dimensions and
-    should have uncorrelated noise.
+    Standard FRC using two input images. Input images must be square, have
+    equal dimensions and should have uncorrelated noise.
+
+    The FRC at ring r, the frequencies f with r <= |f| < r + 1, is
+    Re(sum F1 conj F2) / sqrt(sum |F1|^2 sum |F2|^2), with F1 and F2 the
+    Fourier transforms of the images. See:
+    Van Heel, M. (1987). Similarity measures between images.
+    Ultramicroscopy, 21(1), 95–100. doi:10.1016/0304-3991(87)90010-6
 
     NOTE: The input images should be windowed to prevent FFT artifacts, i.e.
     using a 1/8 Tukey window.
 
     :param img1: Img representing the first image (half data set)
     :param img2: Img representing the second image (half data set)
-    :return: A 1D array with the FRC value for Fourier ring, with the index
-    representing the pixel distance from the origin.
+    :return: A 1D array with the FRC value for each Fourier ring, with the
+    index representing the pixel distance from the origin.
     """
-    # Check if array to test if images must be converted
-    is_arr = isinstance(img1, np.ndarray)
-
-    if is_arr:
-        dip1 = dip.Image(img1)
-        dip2 = dip.Image(img2)
-    else:
-        dip1 = img1
-        dip2 = img2
-        img1 = np.array(img1)
-        img2 = np.array(img2)
-
+    img1 = np.asarray(img1)
+    img2 = np.asarray(img2)
     if not _util.are_sizes_equal([img1, img2]):
         raise ValueError(
             "Images are not of exact equal dimension, or axes are not equal! Trim or pad the images first.")
 
-    return _frc(dip1, dip2)
+    return np.asarray(rustfrc.two_frc(img1, img2))
 
 
-def one_frc(img: Img, method: int = 1) -> np.ndarray:
+def one_frc(img: Img, method: int = 1, seed: Optional[int] = None) -> np.ndarray:
     """
-        FRC using a single input image, which can be either DIP images or NumPy
-        arrays. The image is split into two by sampling binomial distributions
-        for each pixel value. The input image must be a square 2D image.
+        FRC using a single input image. The image is split into two by
+        sampling binomial distributions for each pixel value. The input image
+        must be a square 2D image of counts; floats are cast to int32, which
+        truncates them.
 
         NOTE: The input image should be windowed to prevent FFT artifacts, i.e.
         using a 1/8 Tukey window.
@@ -101,47 +61,29 @@ def one_frc(img: Img, method: int = 1) -> np.ndarray:
         :param Img img: Img representing the image (full data set)
         :param int method: Int representing which method to use. The default is
         method 1.
-        :returns: A 1D array with the FRC value for Fourier ring, with the index
-        representing the pixel distance from the origin.
+        :param seed: A seed for the split, from 0 to 2**64 - 1. The same image
+        and seed give the same curve. Without one, every call splits with a
+        fresh seed from the operating system.
+        :returns: A 1D array with the FRC value for each Fourier ring, with the
+        index representing the pixel distance from the origin.
         """
-    # Check if array to test if images must be converted
-    is_arr = isinstance(img, np.ndarray)
-
-    # Converting is necessary for the binomial split
-    if not is_arr:
-        img = np.array(img)
-
+    img = np.asarray(img)
     if not _util.are_axes_equal(img):
         raise ValueError("Image does not have equal axes! Trim or pad it first.")
+    if img.ndim != 2:
+        raise ValueError("Image is not 2D.")
+    if not np.issubdtype(img.dtype, np.integer):
+        img = img.astype(np.int32)
 
-    split_method: Callable[[np.ndarray], Tuple[np.ndarray, np.ndarray]]
     if method == 1:
-        split_method = _one_frc1
+        return np.asarray(rustfrc.one_frc(img, seed))
     elif method == 2:
-        split_method = _one_frc2
+        seeds = (None, None) if seed is None else np.random.SeedSequence(seed).generate_state(2, np.uint64).tolist()
+        half1 = rustfrc.binom_split(img, seeds[0])
+        half2 = rustfrc.binom_split(img, seeds[1])
+        return np.asarray(rustfrc.two_frc(half1, half2))
     else:
         raise ValueError("Choose either method 1 or 2 for binomial split.")
-
-    # Split is performed
-    img_half1, img_half2 = split_method(img)
-
-    # _frc function requires DIP Image inputs
-    dip1 = dip.Image(img_half1)
-    dip2 = dip.Image(img_half2)
-
-    return _frc(dip1, dip2)
-
-
-def _one_frc2(img: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
-    """ Performs two independent binomial splits. """
-    return r_frc.binom_split(img), r_frc.binom_split(img)
-
-
-def _one_frc1(img: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
-    """ Performs a single binomial split, with the second image equal to the
-    difference of the sampled image and the input image. """
-    img_half1 = r_frc.binom_split(img)
-    return img_half1, img - img_half1
 
 
 def half_bit_threshold(img_size: int) -> Func1D:
@@ -161,7 +103,7 @@ def half_bit_threshold(img_size: int) -> Func1D:
     """
     # Number of pixels in a ring at distance 'array index' from the origin
     # up to a distance 'img_size'
-    nr = np.array(dip.RadialSum(np.ones((img_size*2, img_size*2)), None))[:img_size]
+    nr = np.asarray(rustfrc.ring_counts(img_size * 2))[:img_size].astype(np.float64)
     nr_rt = np.sqrt(nr)
 
     # Exact calculations

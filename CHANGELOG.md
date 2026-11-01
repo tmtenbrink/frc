@@ -2,6 +2,26 @@
 
 ## Unreleased
 
+frc 0.3 computes the FRC in Rust, through rustfrc 2, and depends only on NumPy and rustfrc.
+
+### Added
+
+- A `seed` for `one_frc`. The same image and seed give the same curve on every CPU; without a seed, every call splits with a fresh one.
+- `utility.tukey_window(length, alpha)`, the one-dimensional window that `tukey_square` uses.
+
+### Changed
+
+- `one_frc` and `two_frc` run in rustfrc 2: the split, the Fourier transforms and the ring sums. `one_frc` on a 4096 x 4096 image takes about 30 ms instead of about 1 s, on 8 threads of an AMD EPYC 9V45. Rings hold the same frequencies as DIPlib's `RadialSum`, which frc used before.
+- `one_frc` truncates float images to int32 counts before the split, for both halves; 0.2 kept the fractional part in the second half.
+- `gaussf` filters with NumPy. For sigmas of 0.8 and more it gives what DIPlib gave, to within 1e-14; for smaller sigmas, DIPlib used a Fourier method instead.
+- `tukey_square` computes its window with NumPy, as SciPy did.
+- frc requires rustfrc 2.0 or later, and no longer caps the Python version.
+
+### Removed
+
+- DIPlib and SciPy as dependencies, and with them DIPlib images as input: pass NumPy arrays, for example `np.asarray(dip_image)`.
+- Python 3.10 support. It has reached its end of life, and rustfrc 2 requires Python 3.11.
+
 ### Added
 
 - Support for Python 3.13 and 3.14, with DIPlib 3.5.2 and 3.6.

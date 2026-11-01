@@ -5,20 +5,7 @@
 #                                   TU Delft
 # Tip ten Brink
 
-from frc.deps_types import Img, np, dip, List
-
-
-def dipornp(img: Img, was_arr: bool, is_arr: bool) -> Img:
-    if was_arr:
-        if is_arr:
-            return img
-        else:
-            return np.array(img)
-    else:
-        if not is_arr:
-            return img
-        else:
-            return dip.Image(img)
+from frc.deps_types import np, List
 
 
 def are_axes_equal(a: np.ndarray) -> bool:

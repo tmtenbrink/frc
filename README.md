@@ -4,7 +4,7 @@
 
 This is particularly useful for determining the resolution of images taken with super-resolution microscopy techniques.
 
-Its most computationally intensive functions are all implemented either in NumPy or Rust, making this library quite performant.
+Its most computationally intensive functions are implemented in Rust, in [rustfrc](https://github.com/tiptenbrink/rustfrc): the binomial split and the FRC itself, with its Fourier transforms and ring sums. `one_frc` on a 4096x4096 image takes about 30 ms on 8 threads of an AMD EPYC 9V45, instead of about 1 s before frc 0.3.
 
 ### Fourier Ring Correlation
 
@@ -32,11 +32,11 @@ You can download this library from PyPI:
 pip install frc
 ```
 
-This library depends on [rustfrc](https://github.com/tiptenbrink/rustfrc) (a Rust extension developed specifically for this library), [DIPlib](https://github.com/DIPlib/diplib), [scipy](https://scipy.org/) and of course, [numpy](https://numpy.org/).
+frc depends on [NumPy](https://numpy.org/) and [rustfrc](https://github.com/tiptenbrink/rustfrc), a Rust extension developed for this library. rustfrc has no dependencies, and one wheel per platform covers every CPython from 3.11 on, so frc runs on every Python that NumPy supports.
 
 ### Usage
 
-The code snippet below (which for illustration purposes assumes you have a numpy array or DIP image representing your input, its associated scale and also matplotlib to plot the result) will calculate the FRC curve and the associated resolution using the standard 1/7 threshold.
+The code snippet below (which for illustration purposes assumes you have a NumPy array representing your input, its associated scale and also matplotlib to plot the result) will calculate the FRC curve and the associated resolution using the standard 1/7 threshold.
 
 ```python
 import frc
@@ -46,7 +46,6 @@ import matplotlib.pyplot as plt
 ... # get an image and scale
 
 img = np.array(img)
-# Input can be a numpy array or DIP image
 img = frc.util.square_image(img, add_padding=False)
 img = frc.util.apply_tukey(img)
 # Apply 1FRC technique
