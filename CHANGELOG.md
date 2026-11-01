@@ -1,5 +1,20 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+- Support for Python 3.13 and 3.14, with DIPlib 3.5.2 and 3.6.
+
+### Changed
+
+- frc requires rustfrc 1.2 or later, which brings wheels for every CPython from 3.9 on.
+- The oldest NumPy, SciPy and DIPlib allowed on each Python is the oldest release with wheels for it, so installers no longer try to build one from source.
+
+### Removed
+
+- Python 3.8 and 3.9 support. Both have reached their end of life, and no pytest that runs on them fixes GHSA-6w46-j5rx-g56g.
+
 ## 0.1.3 - 2026-11-01
 
 ### Changed

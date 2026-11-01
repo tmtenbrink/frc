@@ -1,14 +1,13 @@
 # The release of frc to PyPI, copied from examples/pypi-release.yml in
-# touchgate. `touchgate start` starts it when a merge brings in an approval,
-# and the copy on `publish` runs. PyPI trusts this file in the `release`
-# environment.
+# touchgate. `touchgate approve` starts it with a signed approval, and the
+# copy on `publish` runs. PyPI trusts this file in the `release` environment.
 name: release
 
 on:
   workflow_dispatch:
     inputs:
-      commit:
-        description: The merge commit of the release, on the default branch
+      approval:
+        description: The signed approval that `touchgate approve` sends
         required: true
         type: string
 
@@ -28,18 +27,23 @@ jobs:
   verify:
     name: Check the approval
     runs-on: ubuntu-latest
+    outputs:
+      commit: ${{ steps.verify.outputs.commit }}
     permissions:
       contents: read # to fetch the default branch
     steps:
-      - uses: borink-org/touchgate/install@f40941fdd1c86e6ed277b3870aaafdb891251dbe # v0.1.0
+      - uses: borink-org/touchgate/install@c8b416115b3395d5a91ae4a465d794ca437bc354 # v0.2.0
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ github.event.repository.default_branch }}
           fetch-depth: 0
           persist-credentials: false
-      # touchgate reads the commit, the default branch and the commit of this
-      # workflow from the run, and the key from TOUCHGATE_KEY.
-      - run: touchgate verify
+      # touchgate reads the approval, the repository, the default branch and
+      # the commit of this workflow from the run, and the key from
+      # TOUCHGATE_KEY. It sets the output `commit` that the jobs below check
+      # out.
+      - id: verify
+        run: touchgate verify
 
   # The commit is approved from here on, so building it is safe. The build
   # runs in a job that cannot get a PyPI token.
@@ -50,10 +54,10 @@ jobs:
     permissions:
       contents: read # to check out the release
     steps:
-      - uses: borink-org/touchgate/install@f40941fdd1c86e6ed277b3870aaafdb891251dbe # v0.1.0
+      - uses: borink-org/touchgate/install@c8b416115b3395d5a91ae4a465d794ca437bc354 # v0.2.0
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: ${{ inputs.commit }}
+          ref: ${{ needs.verify.outputs.commit }}
           persist-credentials: false
       - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
         with:
@@ -67,15 +71,15 @@ jobs:
           path: dist
           retention-days: 7
 
-  # Publishes only once every check on the merge commit has passed.
+  # Publishes only once every check on the release commit has passed.
   checks:
-    name: Wait for the merge's checks
+    name: Wait for the release commit's checks
     needs: verify
     runs-on: ubuntu-latest
     permissions:
-      checks: read # to read the merge commit's check runs
+      checks: read # to read the release commit's check runs
     steps:
-      - uses: borink-org/touchgate/install@f40941fdd1c86e6ed277b3870aaafdb891251dbe # v0.1.0
+      - uses: borink-org/touchgate/install@c8b416115b3395d5a91ae4a465d794ca437bc354 # v0.2.0
       - run: touchgate wait-for-checks
         env:
           GH_TOKEN: ${{ github.token }}
@@ -84,7 +88,7 @@ jobs:
   # are of this version, signs their attestations and uploads them.
   publish:
     name: Publish to PyPI
-    needs: [build, checks]
+    needs: [verify, build, checks]
     runs-on: ubuntu-latest
     environment: release
     concurrency:
@@ -94,10 +98,10 @@ jobs:
       contents: read # to check out the release
       id-token: write # for PyPI trusted publishing and the attestations
     steps:
-      - uses: borink-org/touchgate/install@f40941fdd1c86e6ed277b3870aaafdb891251dbe # v0.1.0
+      - uses: borink-org/touchgate/install@c8b416115b3395d5a91ae4a465d794ca437bc354 # v0.2.0
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: ${{ inputs.commit }}
+          ref: ${{ needs.verify.outputs.commit }}
           persist-credentials: false
       - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
@@ -112,20 +116,21 @@ jobs:
   # This job runs last, so a tag always names a published release.
   github-release:
     name: Tag and release on GitHub
-    needs: publish
+    needs: [verify, publish]
     runs-on: ubuntu-latest
     permissions:
       contents: write # to create the tag and the release
     steps:
-      - uses: borink-org/touchgate/install@f40941fdd1c86e6ed277b3870aaafdb891251dbe # v0.1.0
+      - uses: borink-org/touchgate/install@c8b416115b3395d5a91ae4a465d794ca437bc354 # v0.2.0
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: ${{ inputs.commit }}
+          ref: ${{ needs.verify.outputs.commit }}
           persist-credentials: false
       - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: dist
           path: dist
+      # Attaches the approval to the release, as touchgate-approval.txt.
       - run: touchgate github-release dist/*
         env:
           GH_TOKEN: ${{ github.token }}

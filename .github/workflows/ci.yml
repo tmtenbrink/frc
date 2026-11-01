@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-          py-version: ['3.8', '3.9', '3.10', '3.11', '3.12']
+          py-version: ['3.10', '3.11', '3.12', '3.13', '3.14']
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -24,8 +24,8 @@ jobs:
       - name: uv sync
         run: uv sync --locked
       - name: Test lowest versions
-        if: ${{ matrix.py-version == '3.8' }}
-        run: uv pip install numpy==1.18.0 scipy==1.3.2 diplib==3.1.0
+        if: ${{ matrix.py-version == '3.10' }}
+        run: uv pip install numpy==1.21.3 scipy==1.7.3 diplib==3.2.0 rustfrc==1.2.0
       - name: Pytest
         run: uv run --no-sync pytest
       - name: Build
