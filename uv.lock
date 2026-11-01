@@ -115,7 +115,7 @@ wheels = [
 
 [[package]]
 name = "frc"
-version = "0.1.2"
+version = "0.1.3"
 source = { editable = "." }
 dependencies = [
     { name = "diplib", version = "3.4.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.9'" },
