@@ -8,13 +8,11 @@ includes dependencies used in two or more related modules.
 # Tip ten Brink
 
 import typing
-import diplib
 import numpy
 
 __all__ = ['Img', 'Func1D', 'NoIntersectionException']
 
 # Imports are redefined to prevent warnings that imports are unused
-dip = diplib
 np = numpy
 
 Callable = typing.Callable
@@ -23,8 +21,8 @@ Optional = typing.Optional
 List = typing.List
 Tuple = typing.Tuple
 
-# Img type that allows interchangeable use of diplib Image and numpy array
-Img = typing.TypeVar('Img', dip.Image, np.ndarray)
+# Images are NumPy arrays. Before 0.3, frc also took DIPlib images.
+Img = np.ndarray
 
 # One-dimensional function that maps (an array of) floats to (an array of) floats
 Func1D = Callable[[Union[np.ndarray, float]], Union[np.ndarray, float]]

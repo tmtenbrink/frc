@@ -5,11 +5,10 @@
 #                                   TU Delft
 # Tip ten Brink
 
-from frc.deps_types import Img, dip, np, Union, Func1D, NoIntersectionException
+from frc.deps_types import Img, np, Union, Func1D, NoIntersectionException
 import frc._internal_utility as _util
-from scipy.signal import windows as wins
 
-__all__ = ['gaussf', 'square_image', 'tukey_square', 'apply_tukey', 'intersection']
+__all__ = ['gaussf', 'square_image', 'tukey_window', 'tukey_square', 'apply_tukey', 'intersection']
 
 
 def square_image(img: Img, add_padding=True) -> Img:
@@ -18,13 +17,11 @@ def square_image(img: Img, add_padding=True) -> Img:
     default and preserving the shortest axis.
     The padding places the input right/bottom of center. If trimming, top/
     left portion of the image is preserved.
-    :param img: Array or DIP image that will be transformed.
+    :param img: Array that will be transformed.
     :param add_padding: If True, add zero-padding to make the image square, otherwise trim the image
-    :return: Array or DIP image (based on input).
+    :return: The square array.
     """
-    is_arr = isinstance(img, np.ndarray)
-    if not is_arr:
-        img = np.array(img)
+    img = np.asarray(img)
 
     if img.ndim == 2:
         x_len = img.shape[0]
@@ -33,7 +30,7 @@ def square_image(img: Img, add_padding=True) -> Img:
         min_axis = np.argmin(lengths)
         min_len = lengths[min_axis]
         if not add_padding:
-            return _util.dipornp(img[:min_len, :min_len], is_arr, True)
+            return img[:min_len, :min_len]
         else:
             max_axis = 1 - min_axis
             max_len = lengths[max_axis]
@@ -46,32 +43,62 @@ def square_image(img: Img, add_padding=True) -> Img:
             y_slice_start = 0 if max_axis == 1 else min_ax_start
             y_slice_end = y_len if max_axis == 1 else min_ax_end
             new_arr[x_slice_start:x_slice_end, y_slice_start:y_slice_end] = img
-            return _util.dipornp(new_arr, is_arr, True)
+            return new_arr
     else:
         raise ValueError("Image not 2D.")
 
 
 def gaussf(img: Img, sigmas=1) -> Img:
     """
-    Gaussian filter using dip.Derivative.
-    :param img: np.ndarray or dip.Image, input image
+    Gaussian filter: the image convolved with a Gaussian of standard deviation
+    sigmas pixels along each axis, truncated at ceil(3 sigmas) pixels and
+    normalized, with the image mirrored about its edge pixels beyond its
+    border. For sigmas of 0.8 and more this is what DIPlib's Derivative
+    computed before frc 0.3; for smaller sigmas, DIPlib used a Fourier method.
+    :param img: Array, input image.
     :param sigmas: Gaussian kernel width, determines smoothing effect.
-    :return: Array or DIP Image representing filtered input.
+    :return: Array of float64 representing filtered input.
     """
-    is_arr = isinstance(img, np.ndarray)
+    out = np.asarray(img, dtype=np.float64)
+    if sigmas <= 0:
+        raise ValueError("sigmas must be positive.")
+    radius = int(np.ceil(3 * sigmas))
+    offsets = np.arange(-radius, radius + 1)
+    kernel = np.exp(-offsets ** 2 / (2.0 * sigmas ** 2))
+    kernel /= kernel.sum()
+    for axis in range(out.ndim):
+        pad = [(0, 0)] * out.ndim
+        pad[axis] = (radius, radius)
+        padded = np.pad(out, pad, mode="reflect")
+        length = out.shape[axis]
+        out = sum(k * np.take(padded, np.arange(i, i + length), axis=axis) for i, k in enumerate(kernel))
+    return out
 
-    if is_arr:
-        img = dip.Image(img)
-    # Gaussian filter
-    img = dip.Derivative(img, derivativeOrder=0, sigmas=[sigmas])
 
-    return _util.dipornp(img, is_arr, False)
+def tukey_window(length: int, alpha=0.125) -> np.ndarray:
+    """ A symmetric Tukey window of length points: a cosine taper over a
+    fraction alpha of the window, flat in between, as
+    scipy.signal.windows.tukey computes it. """
+    if length <= 1:
+        return np.ones(max(length, 0))
+    if alpha <= 0:
+        return np.ones(length)
+    n = np.arange(length)
+    if alpha >= 1:
+        return 0.5 - 0.5 * np.cos(2 * np.pi * n / (length - 1))
+    width = int(np.floor(alpha * (length - 1) / 2.0))
+    n1 = n[0:width + 1]
+    n3 = n[length - width - 1:]
+    w1 = 0.5 * (1 + np.cos(np.pi * (-1 + 2.0 * n1 / alpha / (length - 1))))
+    w2 = np.ones(length - 2 * (width + 1))
+    w3 = 0.5 * (1 + np.cos(np.pi * (-2.0 / alpha + 1 + 2.0 * n3 / alpha / (length - 1))))
+    return np.concatenate((w1, w2, w3))
 
 
 def tukey_square(length, alpha=0.125) -> np.ndarray:
     """ Creates a square Tukey window mask of length x length of width
     alpha. """
-    tukey = wins.tukey(length, alpha=alpha)
+    tukey = tukey_window(length, alpha=alpha)
     return np.ones((length, length)) * tukey.reshape((length, 1)) * tukey.reshape((1, length))
 
 
