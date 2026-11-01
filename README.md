@@ -32,7 +32,7 @@ You can download this library from PyPI:
 pip install frc
 ```
 
-This library depends on [tmtenbrink/rustfrc](https://www.github.com/tmtenbrink/rustfrc) (a Rust extension developed specifically for this library), [DIPlib](https://github.com/DIPlib/diplib), [scipy](https://scipy.org/) and of course, [numpy](https://numpy.org/).
+This library depends on [rustfrc](https://github.com/tiptenbrink/rustfrc) (a Rust extension developed specifically for this library), [DIPlib](https://github.com/DIPlib/diplib), [scipy](https://scipy.org/) and of course, [numpy](https://numpy.org/).
 
 ### Usage
 
