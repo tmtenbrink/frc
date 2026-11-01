@@ -1,10 +1,7 @@
-# The release, started by the touchgate workflow once a merge brings in an
-# approval. The copy on the publish branch is the one that runs and the one
-# PyPI trusts; see docs/RELEASING.md.
-#
-# Every step that does more than build or upload is a touchgate command. The
-# job that publishes is defined here, not in a reusable workflow, because PyPI
-# trusts this file in the `release` environment and the attestations name it.
+# The release of frc to PyPI, copied from examples/pypi-release.yml in
+# touchgate. `touchgate start` starts it when a merge brings in an approval,
+# and the copy on `publish` runs. PyPI trusts this file in the `release`
+# environment.
 name: release
 
 on:
@@ -18,38 +15,34 @@ on:
 permissions: {}
 
 env:
-  # The touchgate commit the release runs, installed in each job that runs it.
-  TOUCHGATE_REV: 75e5c009cf817ec0b09f05513a1ddd4f83eef1ac
-  # The approval key `touchgate verify` checks the approval against.
+  # The public key that approves a release.
   TOUCHGATE_KEY: sk-ssh-ed25519@openssh.com AAAAGnNrLXNzaC1lZDI1NTE5QG9wZW5zc2guY29tAAAAIPK8VZox0UVPB1gsQowDPXlOj1Z34IIJ3V4I2chFNYONAAAAC3NzaDpzaWduaW5n release key
-  # The uv that builds and uploads the release, checked against the checksum
-  # setup-uv knows for it. A package built with uv_build builds with the copy
-  # in this uv, which `touchgate check --build` checks.
+  # The uv that builds and uploads the release. setup-uv checks it against
+  # the checksum it knows for this version. A package built with uv_build
+  # builds with the copy in this uv, which `touchgate check --build` checks.
   UV_VERSION: 0.13.6
 
 jobs:
-  # Checks the approval without running anything from the commit: touchgate
-  # is built before the checkout, and reads the commit with git alone.
+  # Checks the approval before anything from the commit runs. touchgate is
+  # installed before the checkout and reads the commit with git only.
   verify:
     name: Check the approval
     runs-on: ubuntu-latest
     permissions:
       contents: read # to fetch the default branch
     steps:
-      - name: Install touchgate
-        working-directory: ${{ runner.temp }}
-        run: cargo install --locked --git https://github.com/borink-org/touchgate --rev "$TOUCHGATE_REV" touchgate
+      - uses: borink-org/touchgate/install@f40941fdd1c86e6ed277b3870aaafdb891251dbe # v0.1.0
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ github.event.repository.default_branch }}
           fetch-depth: 0
           persist-credentials: false
-      # Reads the commit, the default branch and this workflow's commit from
-      # the run, and the key from TOUCHGATE_KEY.
+      # touchgate reads the commit, the default branch and the commit of this
+      # workflow from the run, and the key from TOUCHGATE_KEY.
       - run: touchgate verify
 
   # The commit is approved from here on, so building it is safe. The build
-  # runs apart from the job that can get a PyPI token.
+  # runs in a job that cannot get a PyPI token.
   build:
     name: Build the release
     needs: verify
@@ -57,9 +50,7 @@ jobs:
     permissions:
       contents: read # to check out the release
     steps:
-      - name: Install touchgate
-        working-directory: ${{ runner.temp }}
-        run: cargo install --locked --git https://github.com/borink-org/touchgate --rev "$TOUCHGATE_REV" touchgate
+      - uses: borink-org/touchgate/install@f40941fdd1c86e6ed277b3870aaafdb891251dbe # v0.1.0
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ inputs.commit }}
@@ -84,15 +75,13 @@ jobs:
     permissions:
       checks: read # to read the merge commit's check runs
     steps:
-      - name: Install touchgate
-        working-directory: ${{ runner.temp }}
-        run: cargo install --locked --git https://github.com/borink-org/touchgate --rev "$TOUCHGATE_REV" touchgate
+      - uses: borink-org/touchgate/install@f40941fdd1c86e6ed277b3870aaafdb891251dbe # v0.1.0
       - run: touchgate wait-for-checks
         env:
           GH_TOKEN: ${{ github.token }}
 
-  # Builds nothing from the commit: it checks the built files are this
-  # version's, signs their attestations and uploads them.
+  # Builds nothing from the commit. touchgate checks that the built files
+  # are of this version, signs their attestations and uploads them.
   publish:
     name: Publish to PyPI
     needs: [build, checks]
@@ -105,9 +94,7 @@ jobs:
       contents: read # to check out the release
       id-token: write # for PyPI trusted publishing and the attestations
     steps:
-      - name: Install touchgate
-        working-directory: ${{ runner.temp }}
-        run: cargo install --locked --git https://github.com/borink-org/touchgate --rev "$TOUCHGATE_REV" touchgate
+      - uses: borink-org/touchgate/install@f40941fdd1c86e6ed277b3870aaafdb891251dbe # v0.1.0
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ inputs.commit }}
@@ -122,7 +109,7 @@ jobs:
           enable-cache: false
       - run: touchgate publish dist
 
-  # Only now does the tag exist, so a tag always names a published release.
+  # This job runs last, so a tag always names a published release.
   github-release:
     name: Tag and release on GitHub
     needs: publish
@@ -130,9 +117,7 @@ jobs:
     permissions:
       contents: write # to create the tag and the release
     steps:
-      - name: Install touchgate
-        working-directory: ${{ runner.temp }}
-        run: cargo install --locked --git https://github.com/borink-org/touchgate --rev "$TOUCHGATE_REV" touchgate
+      - uses: borink-org/touchgate/install@f40941fdd1c86e6ed277b3870aaafdb891251dbe # v0.1.0
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ inputs.commit }}
